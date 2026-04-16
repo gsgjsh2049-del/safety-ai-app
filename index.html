@@ -41,7 +41,6 @@
 </style>
 </head>
 <body>
-
 <div class="header">
   <div class="header-icon">🦺</div>
   <div class="header-text">
@@ -49,7 +48,6 @@
     <p>산업안전보건법 · KOSHA 가이드 기반</p>
   </div>
 </div>
-
 <div class="chat" id="chat">
   <div class="msg ai">
     <div class="ai-label">안전 AI</div>
@@ -62,7 +60,6 @@
     </div>
   </div>
 </div>
-
 <div class="quick">
   <button class="qbtn" onclick="quickAsk('고소작업 안전기준이 어떻게 되나요?')">고소작업 기준</button>
   <button class="qbtn" onclick="quickAsk('밀폐공간 작업 시 필요한 조치는?')">밀폐공간 작업</button>
@@ -70,7 +67,6 @@
   <button class="qbtn" onclick="quickAsk('화학물질 MSDS 비치 의무는?')">MSDS 의무</button>
   <button class="qbtn" onclick="quickAsk('안전모 착용 기준이 어떻게 되나요?')">안전모 기준</button>
 </div>
-
 <div class="input-area">
   <textarea id="userInput" placeholder="안전 관련 질문을 입력하세요..."
     onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
@@ -79,28 +75,42 @@
     <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
   </button>
 </div>
-
 <script>
-const API_KEY = '%%ANTHROPIC_API_KEY%%';
-
-const SYSTEM = `당신은 대한민국 산업현장 안전 전문 AI 어시스턴트입니다.
-
-현장 안전관리자와 작업자의 질문에 법적 근거를 바탕으로 정확하고 실용적으로 답변합니다.
-
-답변 기준:
-1. 산업안전보건법 및 시행규칙·시행령
-2. KOSHA 가이드 및 기술지침
-3. 관련 고시·공고
-
-답변 형식:
-① 핵심 기준 요약
-② 관련 법령 조항 명시 (예: 산업안전보건법 제○조, 안전보건규칙 제○조)
-③ KOSHA 가이드 내용 (있을 경우)
-④ 실무 주의사항
-
-항상 한국어로 답변하고 현장에서 바로 활용할 수 있도록 구체적으로 설명하세요.`;
-
 let history = [];
+
+async function sendMsg() {
+  const input = document.getElementById('userInput');
+  const btn = document.getElementById('sendBtn');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = '42px';
+  btn.disabled = true;
+  addMsg('user', text);
+  history.push({ role: 'user', content: text });
+  showTyping();
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: history })
+    });
+    const data = await res.json();
+    const reply = data.reply || '오류가 발생했습니다. 다시 시도해주세요.';
+    removeTyping();
+    addMsg('ai', reply);
+    history.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    removeTyping();
+    addMsg('ai', '네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+  }
+  btn.disabled = false;
+}
+
+function quickAsk(q) {
+  document.getElementById('userInput').value = q;
+  sendMsg();
+}
 
 function addMsg(role, text) {
   const chat = document.getElementById('chat');
@@ -146,50 +156,6 @@ function showTyping() {
 function removeTyping() {
   const el = document.getElementById('typing');
   if (el) el.remove();
-}
-
-async function sendMsg() {
-  const input = document.getElementById('userInput');
-  const btn = document.getElementById('sendBtn');
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = '';
-  input.style.height = '42px';
-  btn.disabled = true;
-  addMsg('user', text);
-  history.push({ role: 'user', content: text });
-  showTyping();
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-allow-browser': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1024,
-        system: SYSTEM,
-        messages: history
-      })
-    });
-    const data = await res.json();
-    const reply = data.content?.[0]?.text || '오류가 발생했습니다. 다시 시도해주세요.';
-    removeTyping();
-    addMsg('ai', reply);
-    history.push({ role: 'assistant', content: reply });
-  } catch(e) {
-    removeTyping();
-    addMsg('ai', '네트워크 오류가 발생했습니다. 다시 시도해주세요.');
-  }
-  btn.disabled = false;
-}
-
-function quickAsk(q) {
-  document.getElementById('userInput').value = q;
-  sendMsg();
 }
 </script>
 </body>
