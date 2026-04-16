@@ -38,18 +38,32 @@
   .dot:nth-child(2) { animation-delay: 0.2s; }
   .dot:nth-child(3) { animation-delay: 0.4s; }
   @keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+  .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:100; overflow-y:auto; }
+  .modal-inner { background:white; margin:20px; border-radius:16px; padding:20px; }
+  .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .modal-header h2 { font-size:16px; font-weight:600; }
+  .close-btn { border:none; background:none; font-size:22px; cursor:pointer; color:#666; }
+  .form-group { margin-bottom:14px; }
+  .form-group label { font-size:12px; color:#666; display:block; margin-bottom:5px; font-weight:500; }
+  .form-group input, .form-group textarea { width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; font-size:14px; font-family:inherit; outline:none; }
+  .form-group input:focus, .form-group textarea:focus { border-color:#1a4a7a; }
+  .form-group textarea { height:90px; resize:none; }
+  .submit-btn { width:100%; padding:13px; background:#1a4a7a; color:white; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; margin-top:6px; }
+  .submit-btn:disabled { background:#ccc; }
 </style>
 </head>
 <body>
+
 <div class="header">
   <div class="header-icon">
-    <img src="/logo.jpg" style="width:40px;height:40px;border-radius:6px;object-fit:cover;">
+    <img src="/1.jpg" style="width:40px;height:40px;border-radius:6px;object-fit:cover;">
   </div>
   <div class="header-text">
     <h1>제일연마공업(주) 안전 AI 어시스턴트</h1>
     <p>산업안전보건법 · KOSHA 가이드 기반</p>
   </div>
 </div>
+
 <div class="chat" id="chat">
   <div class="msg ai">
     <div class="ai-label">안전 AI</div>
@@ -62,11 +76,7 @@
     </div>
   </div>
 </div>
- <div style="padding: 8px 16px; background: white; border-top: 1px solid #eee;">
-  <a href="/safety-manual.pdf" target="_blank" style="display:block; text-align:center; padding: 10px; background: #1a4a7a; color: white; border-radius: 10px; font-size: 13px; text-decoration: none;">
-    📄 안전보호구 매뉴얼 원본 보기
-  </a>
-</div>
+
 <div class="quick">
   <button class="qbtn" onclick="quickAsk('고소작업 안전기준이 어떻게 되나요?')">고소작업 기준</button>
   <button class="qbtn" onclick="quickAsk('밀폐공간 작업 시 필요한 조치는?')">밀폐공간 작업</button>
@@ -74,6 +84,19 @@
   <button class="qbtn" onclick="quickAsk('화학물질 MSDS 비치 의무는?')">MSDS 의무</button>
   <button class="qbtn" onclick="quickAsk('안전모 착용 기준이 어떻게 되나요?')">안전모 기준</button>
 </div>
+
+<div style="padding: 8px 16px; background: white; border-top: 1px solid #eee;">
+  <button onclick="showRiskForm()" style="display:block; width:100%; text-align:center; padding: 10px; background: #c0392b; color: white; border-radius: 10px; font-size: 13px; border: none; cursor: pointer;">
+    📋 위험성 평가서 작성
+  </button>
+</div>
+
+<div style="padding: 6px 16px 10px; background: white;">
+  <a href="/safety-manual.pdf" target="_blank" style="display:block; text-align:center; padding: 10px; background: #1a4a7a; color: white; border-radius: 10px; font-size: 13px; text-decoration: none;">
+    📄 안전보호구 매뉴얼 원본 보기
+  </a>
+</div>
+
 <div class="input-area">
   <textarea id="userInput" placeholder="안전 관련 질문을 입력하세요..."
     onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
@@ -82,8 +105,54 @@
     <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
   </button>
 </div>
+
+<!-- 위험성 평가서 모달 -->
+<div class="modal" id="riskModal">
+  <div class="modal-inner">
+    <div class="modal-header">
+      <h2>📋 위험성 평가서</h2>
+      <button class="close-btn" onclick="closeRiskForm()">✕</button>
+    </div>
+
+    <div class="form-group">
+      <label>업체명 *</label>
+      <input id="r_업체명" type="text" placeholder="업체명 입력">
+    </div>
+    <div class="form-group">
+      <label>작업일자 *</label>
+      <input id="r_작업일자" type="date">
+    </div>
+    <div class="form-group">
+      <label>작업장소 및 설비명 *</label>
+      <input id="r_작업장소" type="text" placeholder="작업장소 및 설비명 입력">
+    </div>
+    <div class="form-group">
+      <label>위험요인 *</label>
+      <textarea id="r_위험요인" placeholder="위험요인 입력"></textarea>
+    </div>
+    <div class="form-group">
+      <label>안전대책 *</label>
+      <textarea id="r_안전대책" placeholder="안전대책 입력"></textarea>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitRiskForm()">제출하기</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script>
 let history = [];
+let emailjsReady = false;
+
+async function initEmailJS() {
+  try {
+    const res = await fetch('/api/emailjs-key');
+    const data = await res.json();
+    emailjs.init(data.publicKey);
+    emailjsReady = true;
+  } catch(e) {}
+}
+initEmailJS();
 
 async function sendMsg() {
   const input = document.getElementById('userInput');
@@ -163,6 +232,56 @@ function showTyping() {
 function removeTyping() {
   const el = document.getElementById('typing');
   if (el) el.remove();
+}
+
+function showRiskForm() {
+  document.getElementById('riskModal').style.display = 'block';
+}
+
+function closeRiskForm() {
+  document.getElementById('riskModal').style.display = 'none';
+}
+
+async function submitRiskForm() {
+  const fields = {
+    '업체명': 'r_업체명',
+    '작업일자': 'r_작업일자',
+    '작업장소 및 설비명': 'r_작업장소',
+    '위험요인': 'r_위험요인',
+    '안전대책': 'r_안전대책'
+  };
+
+  const params = {};
+  for (const [label, id] of Object.entries(fields)) {
+    const val = document.getElementById(id).value.trim();
+    if (!val) { alert(label + '을(를) 입력해주세요.'); return; }
+    params[label] = val;
+  }
+  params['제출시간'] = new Date().toLocaleString('ko-KR');
+
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = '제출 중...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('위험성 평가서가 제출되었습니다!');
+      closeRiskForm();
+      document.querySelectorAll('#riskModal input, #riskModal textarea').forEach(el => el.value = '');
+    } else {
+      alert('제출 실패. 다시 시도해주세요.');
+    }
+  } catch(e) {
+    alert('오류가 발생했습니다. 다시 시도해주세요.');
+  }
+  btn.textContent = '제출하기';
+  btn.disabled = false;
 }
 </script>
 </body>
