@@ -310,6 +310,17 @@ async function submitRiskForm() {
   btn.textContent = '제출하기';
   btn.disabled = false;
 }
+ function toggleSafetyMenu() {
+  const menu = document.getElementById('safetyMenu');
+  const btn = document.getElementById('safetyMenuBtn');
+  if (menu.style.display === 'none' || menu.style.display === '') {
+    menu.style.display = 'flex';
+    btn.textContent = '📁 작업별 안전조치사항 ▲';
+  } else {
+    menu.style.display = 'none';
+    btn.textContent = '📁 작업별 안전조치사항 ▼';
+  }
+}
 </script>
 </body>
 </html>
