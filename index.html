@@ -90,7 +90,25 @@
     📋 위험성 평가서 작성
   </button>
 </div>
-
+<div style="padding: 8px 16px 0; background: white; border-top: 1px solid #eee;">
+  <button onclick="toggleSafetyMenu()" id="safetyMenuBtn" style="display:block; width:100%; text-align:center; padding: 10px; background: #e67e22; color: white; border-radius: 10px; font-size: 13px; border: none; cursor: pointer;">
+    📁 작업별 안전조치사항 ▼
+  </button>
+  <div id="safetyMenu" style="display:none; margin-top:6px; display:none; flex-direction:column; gap:6px;">
+    <a href="/work-height.pdf" target="_blank" style="display:block; text-align:center; padding: 9px; background: #fef9f0; color: #e67e22; border-radius: 8px; font-size: 13px; text-decoration: none; border: 1px solid #f0c070;">
+      🔺 고소작업
+    </a>
+    <a href="/forklift.pdf" target="_blank" style="display:block; text-align:center; padding: 9px; background: #fef9f0; color: #e67e22; border-radius: 8px; font-size: 13px; text-decoration: none; border: 1px solid #f0c070;">
+      🚜 지게차 작업
+    </a>
+    <a href="/fire-work.pdf" target="_blank" style="display:block; text-align:center; padding: 9px; background: #fef9f0; color: #e67e22; border-radius: 8px; font-size: 13px; text-decoration: none; border: 1px solid #f0c070;">
+      🔥 화기작업
+    </a>
+    <a href="/equipment-check.pdf" target="_blank" style="display:block; text-align:center; padding: 9px; background: #fef9f0; color: #e67e22; border-radius: 8px; font-size: 13px; text-decoration: none; border: 1px solid #f0c070;">
+      🔧 설비점검
+    </a>
+  </div>
+</div>
 <div style="padding: 6px 16px 10px; background: white;">
   <a href="/safety-manual.pdf" target="_blank" style="display:block; text-align:center; padding: 10px; background: #1a4a7a; color: white; border-radius: 10px; font-size: 13px; text-decoration: none;">
     📄 안전보호구 매뉴얼 원본 보기
