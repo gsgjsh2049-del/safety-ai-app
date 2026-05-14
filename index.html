@@ -176,12 +176,15 @@ async function loadFiles() {
 function openPDF(url, title) {
   document.getElementById('pdfTitle').textContent = title;
 
-  // ✅ 다운로드 버튼: 서버 경유
   const filePath = url.replace('https://raw.githubusercontent.com/gsgjsh2049-del/safety-ai-app/main/', '');
   const downloadUrl = '/api/msds?path=' + encodeURIComponent(filePath) + '&download=true';
-  document.getElementById('pdfDownload').href = downloadUrl;
 
-  // Google Viewer로 보기
+  // ✅ 아이폰 Safari: 새 탭으로 열어야 PDF 정상 표시
+  const dlBtn = document.getElementById('pdfDownload');
+  dlBtn.href = downloadUrl;
+  dlBtn.target = '_blank';
+  dlBtn.rel = 'noopener noreferrer';
+
   const viewerUrl = 'https://docs.google.com/viewer?url=' + encodeURIComponent(url) + '&embedded=true';
   document.getElementById('pdfFrame').src = viewerUrl;
   document.getElementById('pdfOverlay').classList.add('show');
