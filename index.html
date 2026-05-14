@@ -82,13 +82,11 @@ iframe { flex: 1; width: 100%; border: none; }
 <script>
 const REPO = 'gsgjsh2049-del/safety-ai-app';
 const BRANCH = 'main';
-const API = 'https://api.github.com/repos/' + REPO + '/contents/';
-const RAW = 'https://raw.githubusercontent.com/' + REPO + '/' + BRANCH + '/';
 
 const msdsTree = {
   '비트리': { '원료': { '지립': { '알루미나': null, '실리콘카바이드': null }, '결합제': null }, '부재료': { '착색제': null, '점결제': null, '습윤제': null }, '기타': { '경화제': null, '도료': null, '세척제': null, '유류': null, '접착제': null, '함침제': null } },
   '레진': { '원료': { '지립': { '실리콘카바이드': null, '알루미나': null, '알루미나-지르코니아': null }, '결합제': { '노볼락(분말)': null, '레졸(액상)': null } }, '부재료': { '보강제': null, '습윤제': null, '착색제': null, '충진제': null, '기공제': null }, '기타': { '도료': null, '세척제': null, '이형제': null, '접착제': null, '유류': null } },
-  '초지립': { '원료': { '지립': { '알루미나': null, '실리콘카바이드': null, 'CBN (일반)': null, 'CBN (코팅)': null, 'DIA (일반)': null, 'DIA (코팅)': null,}, '결합제': { '노볼락(분말)': null, '레졸(액상)': null } }, '부재료': { '습윤제': null, '충진제': null }, '기타': { '세척제': null, '유류': { '방청유': null, '유압유': null, '작동유': null, '절삭유': null }, '접착제': null } },
+  '초지립': { '원료': { '지립': { '알루미나': null, '실리콘카바이드': null, 'CBN (일반)': null, 'CBN (코팅)': null, 'DIA (일반)': null, 'DIA (코팅)': null }, '결합제': { '노볼락(분말)': null, '레졸(액상)': null } }, '부재료': { '습윤제': null, '충진제': null }, '기타': { '세척제': null, '유류': { '방청유': null, '유압유': null, '작동유': null, '절삭유': null }, '접착제': null } },
   '중연삭': { '원료': { '지립': { '알루미나': null, '실리콘카바이드': null, '알루미나-지르코니아': null }, '결합제': { '노볼락(분말)': null } }, '부재료': { '보강제': null, '습윤제': null, '충진제': null }, '기타': { '도료': null, '세척제': null, '흡습제': null, '유류': { '연료유': null, '작동유': null, '방청유': null }, '이형제': null, '접착제': null } },
   '소성': { '기타': { '내화&단열제': null, '도료': null, '실리콘': null, '유류': { '윤활유': null, '방청유': null } } },
   '세공': { '기타': { '부싱': null, '유류': { '연료유': null } } },
@@ -122,10 +120,7 @@ function renderMSDS() {
   let cur = msdsTree;
   for (const k of mPath) cur = cur[k];
 
-  if (cur === null) {
-    loadFiles();
-    return;
-  }
+  if (cur === null) { loadFiles(); return; }
 
   const keys = Object.keys(cur);
   const cls = mPath.length === 0 ? '' : mPath.length === 1 ? 'green' : 'orange';
@@ -152,11 +147,16 @@ async function loadFiles() {
   body.innerHTML = '<div class="loading">📂 파일 목록 불러오는 중...</div>';
 
   const folderPath = 'MSDS/' + mPath.join('/');
-  const encoded = folderPath.split('/').map(encodeURIComponent).join('/');
 
   try {
-    const res = await fetch('/api/msds?path=' + encodeURIComponent('MSDS/' + mPath.join('/')));
+    const res = await fetch('/api/msds?path=' + encodeURIComponent(folderPath));
     const files = await res.json();
+
+    if (!Array.isArray(files)) {
+      body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
+      return;
+    }
+
     const pdfs = files.filter(f => f.name.endsWith('.pdf'));
 
     if (pdfs.length === 0) {
@@ -165,29 +165,27 @@ async function loadFiles() {
     }
 
     body.innerHTML = '<div class="grid1">' + pdfs.map(f => {
-      const url = RAW + encoded + '/' + encodeURIComponent(f.name);
-      return `<div class="file-item" onclick="openPDF('${url}','${f.name.replace('.pdf','').replace(/'/g,"\\'")}')">📄 ${f.name.replace('.pdf','')}</div>`;
+      const filePath = folderPath + '/' + f.name;
+      const displayName = f.name.replace('.pdf', '');
+      return `<div class="file-item" onclick="openPDF('${filePath.replace(/'/g,"\\'")}','${displayName.replace(/'/g,"\\'")}')">📄 ${displayName}</div>`;
     }).join('') + '</div>';
+
   } catch(e) {
     body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
   }
 }
 
-function openPDF(url, title) {
-  document.getElementById('pdfTitle').textContent = title;
-
-  const filePath = url.replace('https://raw.githubusercontent.com/gsgjsh2049-del/safety-ai-app/main/', '');
+function openPDF(filePath, title) {
   const baseUrl = '/api/msds?path=' + encodeURIComponent(filePath);
 
-  // ✅ 미리보기: 서버에서 직접 PDF 스트리밍
+  document.getElementById('pdfTitle').textContent = title;
   document.getElementById('pdfFrame').src = baseUrl + '&preview=true';
 
-  // ✅ 다운로드: 서버에서 attachment로 전달
   const dlBtn = document.getElementById('pdfDownload');
   dlBtn.href = baseUrl + '&download=true';
+  dlBtn.download = title + '.pdf';
   dlBtn.target = '_blank';
   dlBtn.rel = 'noopener noreferrer';
-  dlBtn.download = title + '.pdf';
 
   document.getElementById('pdfOverlay').classList.add('show');
 }
