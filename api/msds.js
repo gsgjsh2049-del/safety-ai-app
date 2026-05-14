@@ -10,19 +10,25 @@ export default async function handler(req, res) {
     const encoded = path.split('/').map(encodeURIComponent).join('/');
 
     // ✅ 다운로드 모드: 파일 바이너리를 직접 전달
-    if (download === 'true') {
-      const rawUrl = `https://raw.githubusercontent.com/gsgjsh2049-del/safety-ai-app/main/${encoded}`;
-      const fileRes = await fetch(rawUrl, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+    if (download === 'true' || req.query.preview === 'true') {
+  const rawUrl = `https://raw.githubusercontent.com/gsgjsh2049-del/safety-ai-app/main/${encoded}`;
+  const fileRes = await fetch(rawUrl, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
 
-      const fileName = path.split('/').pop();
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
-      const buffer = await fileRes.arrayBuffer();
-      res.send(Buffer.from(buffer));
-      return;
-    }
+  const fileName = path.split('/').pop();
+  res.setHeader('Content-Type', 'application/pdf');
+
+  if (download === 'true') {
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+  } else {
+    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileName)}"`);
+  }
+
+  const buffer = await fileRes.arrayBuffer();
+  res.send(Buffer.from(buffer));
+  return;
+}
 
     // 기존: 폴더 목록 조회
     const apiUrl = `https://api.github.com/repos/gsgjsh2049-del/safety-ai-app/contents/${encoded}?ref=main`;
