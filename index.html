@@ -155,7 +155,7 @@ async function loadFiles() {
   const encoded = folderPath.split('/').map(encodeURIComponent).join('/');
 
   try {
-    const res = await fetch(API + encoded + '?ref=' + BRANCH);
+    const res = await fetch('/api/msds?path=' + encodeURIComponent('MSDS/' + mPath.join('/')));
     const files = await res.json();
     const pdfs = files.filter(f => f.name.endsWith('.pdf'));
 
@@ -175,7 +175,8 @@ async function loadFiles() {
 
 function openPDF(url, title) {
   document.getElementById('pdfTitle').textContent = title;
-  document.getElementById('pdfFrame').src = url;
+  const viewerUrl = 'https://docs.google.com/viewer?url=' + encodeURIComponent(url) + '&embedded=true';
+  document.getElementById('pdfFrame').src = viewerUrl;
   document.getElementById('pdfDownload').href = url;
   document.getElementById('pdfOverlay').classList.add('show');
 }
