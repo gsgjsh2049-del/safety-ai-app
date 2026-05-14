@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  const { path, download } = req.query;
+  const { path, preview, download } = req.query;
 
   if (!path) return res.status(400).json({ error: 'path 파라미터가 필요합니다.' });
 
@@ -9,28 +9,29 @@ export default async function handler(req, res) {
   try {
     const encoded = path.split('/').map(encodeURIComponent).join('/');
 
-    // ✅ 다운로드 모드: 파일 바이너리를 직접 전달
-    if (download === 'true' || req.query.preview === 'true') {
-  const rawUrl = `https://raw.githubusercontent.com/gsgjsh2049-del/safety-ai-app/main/${encoded}`;
-  const fileRes = await fetch(rawUrl, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
+    if (preview === 'true' || download === 'true') {
+      const rawUrl = `https://raw.githubusercontent.com/gsgjsh2049-del/safety-ai-app/main/${encoded}`;
+      const fileRes = await fetch(rawUrl, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
 
-  const fileName = path.split('/').pop();
-  res.setHeader('Content-Type', 'application/pdf');
+      if (!fileRes.ok) {
+        return res.status(fileRes.status).json({ error: '파일을 가져올 수 없습니다.' });
+      }
 
-  if (download === 'true') {
-    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
-  } else {
-    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileName)}"`);
-  }
+      const fileName = path.split('/').pop();
+      res.setHeader('Content-Type', 'application/pdf');
 
-  const buffer = await fileRes.arrayBuffer();
-  res.send(Buffer.from(buffer));
-  return;
-}
+      if (download === 'true') {
+        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+      } else {
+        res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileName)}"`);
+      }
 
-    // 기존: 폴더 목록 조회
+      const buffer = await fileRes.arrayBuffer();
+      return res.send(Buffer.from(buffer));
+    }
+
     const apiUrl = `https://api.github.com/repos/gsgjsh2049-del/safety-ai-app/contents/${encoded}?ref=main`;
     const response = await fetch(apiUrl, {
       headers: {
@@ -41,8 +42,9 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    res.status(response.status).json(data);
+    return res.status(response.status).json(data);
+
   } catch (error) {
-    res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+    return res.status(500).json({ error: '서버 오류가 발생했습니다.' });
   }
 }
