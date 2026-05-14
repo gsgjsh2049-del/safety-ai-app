@@ -5,318 +5,192 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>안전보건 정보센터</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, sans-serif; background: #f5f5f5; height: 100dvh; display: flex; flex-direction: column; }
-  .header { background: #1a4a7a; color: white; padding: 14px 16px; display: flex; align-items: center; gap: 10px; }
-  .header-icon { font-size: 22px; }
-  .header-text h1 { font-size: 16px; font-weight: 600; }
-  .header-text p { font-size: 11px; opacity: 0.75; margin-top: 2px; }
-  .chat { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-  .msg { display: flex; flex-direction: column; gap: 4px; }
-  .msg.user { align-items: flex-end; }
-  .msg.ai { align-items: flex-start; }
-  .bubble { padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.6; max-width: 85%; white-space: pre-wrap; }
-  .user .bubble { background: #1a4a7a; color: white; border-bottom-right-radius: 4px; }
-  .ai .bubble { background: white; color: #222; border-bottom-left-radius: 4px; border: 1px solid #e5e5e5; }
-  .ai-label { font-size: 11px; color: #888; padding-left: 2px; }
-  .tags { display: flex; gap: 5px; margin-top: 4px; }
-  .tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
-  .tag-law { background: #E6F1FB; color: #0C447C; }
-  .tag-kosha { background: #EAF3DE; color: #3B6D11; }
-  .quick { padding: 10px 16px; display: flex; gap: 8px; overflow-x: auto; background: white; border-top: 1px solid #eee; }
-  .quick::-webkit-scrollbar { display: none; }
-  .qbtn { font-size: 12px; padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; background: white; white-space: nowrap; cursor: pointer; color: #444; flex-shrink: 0; }
-  .qbtn:active { background: #f0f0f0; }
-  .input-area { padding: 10px 12px; background: white; border-top: 1px solid #eee; display: flex; gap: 8px; align-items: flex-end; }
-  .input-area textarea { flex: 1; border: 1px solid #ddd; border-radius: 12px; padding: 9px 12px; font-size: 14px; font-family: inherit; resize: none; height: 42px; max-height: 100px; outline: none; line-height: 1.4; }
-  .input-area textarea:focus { border-color: #1a4a7a; }
-  .send-btn { width: 40px; height: 40px; border-radius: 50%; background: #1a4a7a; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .send-btn:disabled { background: #ccc; }
-  .send-btn svg { width: 16px; height: 16px; fill: white; }
-  .typing { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: #bbb; animation: blink 1.2s infinite; }
-  .dot:nth-child(2) { animation-delay: 0.2s; }
-  .dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
-  .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:100; overflow-y:auto; }
-  .modal-inner { background:white; margin:20px; border-radius:16px; padding:20px; }
-  .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
-  .modal-header h2 { font-size:16px; font-weight:600; }
-  .close-btn { border:none; background:none; font-size:22px; cursor:pointer; color:#666; }
-  .form-group { margin-bottom:14px; }
-  .form-group label { font-size:12px; color:#666; display:block; margin-bottom:5px; font-weight:500; }
-  .form-group input, .form-group textarea { width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; font-size:14px; font-family:inherit; outline:none; }
-  .form-group input:focus, .form-group textarea:focus { border-color:#1a4a7a; }
-  .form-group textarea { height:90px; resize:none; }
-  .submit-btn { width:100%; padding:13px; background:#1a4a7a; color:white; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; margin-top:6px; }
-  .submit-btn:disabled { background:#ccc; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, sans-serif; background: #f0f2f5; min-height: 100dvh; }
+.header { background: #1a4a7a; color: white; padding: 14px 16px; display: flex; align-items: center; gap: 10px; }
+.header img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
+.header h1 { font-size: 15px; font-weight: 600; }
+.header p { font-size: 11px; opacity: 0.75; margin-top: 2px; }
+.main { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.menu-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; color: white; text-align: left; }
+.btn-blue { background: #1a4a7a; }
+.btn-teal { background: #16a085; }
+.btn-purple { background: #8e44ad; }
+.sub-panel { display: none; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.panel-title { padding: 12px 16px; background: #f8f8f8; border-bottom: 1px solid #eee; font-size: 13px; font-weight: 600; color: #444; display: flex; align-items: center; gap: 8px; }
+.back-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #666; line-height: 1; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px; }
+.grid1 { display: flex; flex-direction: column; gap: 8px; padding: 12px; }
+.cat-btn { padding: 14px 10px; border: 1px solid #dde; border-radius: 8px; background: #f0f4ff; font-size: 13px; font-weight: 500; cursor: pointer; text-align: center; color: #2c3e7a; }
+.cat-btn:active { background: #dce3ff; }
+.cat-btn.green { background: #f0fff4; border-color: #b2dfdb; color: #1b5e3b; }
+.cat-btn.orange { background: #fff8f0; border-color: #ffcc99; color: #7a3c00; }
+.file-link { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #f8f8f8; border-radius: 8px; text-decoration: none; color: #333; font-size: 13px; border: 1px solid #eee; cursor: pointer; }
+.file-link:active { background: #efefef; }
+.safety-link { display: flex; align-items: center; gap: 10px; padding: 14px; background: #e8f0fe; border-radius: 10px; text-decoration: none; color: #1a4a7a; font-size: 14px; font-weight: 500; border: 1px solid #c5d8f8; cursor: pointer; }
+.safety-link:active { background: #d0e2fc; }
+.pdf-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; flex-direction: column; }
+.pdf-overlay.show { display: flex; }
+.pdf-bar { background: #1a4a7a; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+.pdf-bar span { color: white; font-size: 14px; font-weight: 500; }
+.pdf-bar button { background: none; border: none; color: white; font-size: 26px; cursor: pointer; line-height: 1; }
+.pdf-bar a { color: #adf; font-size: 13px; text-decoration: none; }
+iframe { flex: 1; width: 100%; border: none; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-icon">
-    <img src="/logo.jpg" style="width:40px;height:40px;border-radius:6px;object-fit:cover;">
-  </div>
-  <div class="header-text">
+  <img src="/logo.jpg" alt="로고">
+  <div>
     <h1>제일연마공업(주) 안전보건 정보센터</h1>
-    <p>안전보건 정보 제공 시스템</p>
+    <p>현장 안전보건 정보 제공 시스템</p>
   </div>
 </div>
 
-<div class="chat" id="chat">
-  <div class="msg ai">
-    <div class="ai-label">안전 AI</div>
-    <div class="bubble">안전과 관련한 질문을 해주세요.
+<div class="main">
 
-산업안전보건법과 KOSHA 가이드를 바탕으로 법적기준과 기술적인 내용을 알려드립니다.</div>
-    <div class="tags">
-      <span class="tag tag-law">산업안전보건법</span>
-      <span class="tag tag-kosha">KOSHA 가이드</span>
+  <!-- 작업별 안전조치사항 -->
+  <button class="menu-btn btn-blue" onclick="togglePanel('p1')">🦺 작업별 안전조치사항</button>
+  <div class="sub-panel" id="p1">
+    <div class="panel-title">🦺 작업별 안전조치사항</div>
+    <div class="grid1">
+      <div class="safety-link" onclick="openPDF('/work-height.pdf','고소작업')">🔺 고소작업</div>
+      <div class="safety-link" onclick="openPDF('/forklift.pdf','지게차 작업')">🚜 지게차 작업</div>
+      <div class="safety-link" onclick="openPDF('/fire-work.pdf','화기작업')">🔥 화기작업</div>
+      <div class="safety-link" onclick="openPDF('/equipment-check.pdf','설비점검')">🔧 설비점검</div>
     </div>
   </div>
-</div>
 
-<div class="quick">
-  <button class="qbtn" onclick="quickAsk('고소작업 안전기준이 어떻게 되나요?')">고소작업 기준</button>
-  <button class="qbtn" onclick="quickAsk('밀폐공간 작업 시 필요한 조치는?')">밀폐공간 작업</button>
-  <button class="qbtn" onclick="quickAsk('지게차 안전작업 법적 기준은?')">지게차 기준</button>
-  <button class="qbtn" onclick="quickAsk('화학물질 MSDS 비치 의무는?')">MSDS 의무</button>
-  <button class="qbtn" onclick="quickAsk('안전모 착용 기준이 어떻게 되나요?')">안전모 기준</button>
-</div>
-
-<div style="padding: 8px 16px 10px; background: white; border-top: 1px solid #eee;">
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLSca1HAC42L-TpwggZbyk_WSHFHOhVtwOdODIkL9EeSQn0_SCQ/viewform?usp=header" target="_blank" style="display:block; text-align:center; padding: 10px; background: #8e44ad; color: white; border-radius: 10px; font-size: 13px; text-decoration: none;">
-      💬 안전보건 의견 청취
-    </a>
-    <button onclick="showRiskForm()" style="display:block; width:100%; text-align:center; padding: 10px; background: #c0392b; color: white; border-radius: 10px; font-size: 13px; border: none; cursor: pointer;">
-      📋 위험성평가 진행하기
-    </button>
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLSe0a5E0dSDqWy7QnB7OTo74fOJX7xNUQ8NMoDvX9wuvVkSTXA/viewform?usp=header" target="_blank" style="display:block; text-align:center; padding: 10px; background: #27ae60; color: white; border-radius: 10px; font-size: 13px; text-decoration: none;">
-      📝 TBM일지 작성하기
-    </a>
-    <button onclick="toggleSafetyMenu()" id="safetyMenuBtn" style="display:block; width:100%; text-align:center; padding: 10px; background: #e67e22; color: white; border-radius: 10px; font-size: 13px; border: none; cursor: pointer;">
-      📁 작업별 안전조치사항 ▼
-    </button>
+  <!-- MSDS -->
+  <button class="menu-btn btn-teal" onclick="togglePanel('p2'); initMSDS()">⚗️ MSDS 조회</button>
+  <div class="sub-panel" id="p2">
+    <div class="panel-title" id="msdsTitle">⚗️ 공정 선택</div>
+    <div id="msdsBody"></div>
   </div>
-  <div id="safetyMenu" style="display:none; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px;">
-    <a href="/work-height.pdf" target="_blank" style="display:block; text-align:center; padding: 9px; background: #fef9f0; color: #e67e22; border-radius: 8px; font-size: 13px; text-decoration: none; border: 1px solid #f0c070;">
-      🔺 고소작업
-    </a>
-    <a href="/forklift.pdf" target="_blank" style="display:block; text-align:center; padding: 9px; background: #fef9f0; color: #e67e22; border-radius: 8px; font-size: 13px; text-decoration: none; border: 1px solid #f0c070;">
-      🚜 지게차 작업
-    </a>
-    <a href="/fire-work.pdf" target="_blank" style="display:block; text-align:center; padding: 9px; background: #fef9f0; color: #e67e22; border-radius: 8px; font-size: 13px; text-decoration: none; border: 1px solid #f0c070;">
-      🔥 화기작업
-    </a>
-    <a href="/equipment-check.pdf" target="_blank" style="display:block; text-align:center; padding: 9px; background: #fef9f0; color: #e67e22; border-radius: 8px; font-size: 13px; text-decoration: none; border: 1px solid #f0c070;">
-      🔧 설비점검
-    </a>
+
+  <!-- 안전보건매뉴얼 -->
+  <button class="menu-btn btn-purple" onclick="openPDF('/safety-manual.pdf','안전보건매뉴얼')">📄 안전보건매뉴얼</button>
+
+</div>
+
+<!-- PDF 뷰어 -->
+<div class="pdf-overlay" id="pdfOverlay">
+  <div class="pdf-bar">
+    <span id="pdfTitle">문서</span>
+    <a id="pdfDownload" href="" download target="_blank">⬇ 다운로드</a>
+    <button onclick="closePDF()">✕</button>
   </div>
-  <a href="/safety-manual.pdf" target="_blank" style="display:block; text-align:center; padding: 10px; background: #1a4a7a; color: white; border-radius: 10px; font-size: 13px; text-decoration: none;">
-    📄 안전보건매뉴얼 조회
-  </a>
-  <a href="https://drive.google.com/drive/folders/1iocfjay5gd9y--gIQAxbDGeUYuGr-0H9?usp=drive_link" target="_blank" style="display:block; text-align:center; padding: 10px; background: #16a085; color: white; border-radius: 10px; font-size: 13px; text-decoration: none; margin-top: 6px;">
-  ⚗️ MSDS/경고표지 조회
-  </a>
-</div>
-<div class="input-area">
-  <textarea id="userInput" placeholder="안전 관련 질문을 입력하세요..."
-    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
-    oninput="this.style.height='42px';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
-  <button class="send-btn" id="sendBtn" onclick="sendMsg()">
-    <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
-  </button>
+  <iframe id="pdfFrame" src=""></iframe>
 </div>
 
-<!-- 위험성 평가서 모달 -->
-<div class="modal" id="riskModal">
-  <div class="modal-inner">
-    <div class="modal-header">
-      <h2>📋 위험성 평가서</h2>
-      <button class="close-btn" onclick="closeRiskForm()">✕</button>
-    </div>
-
-    <div class="form-group">
-      <label>업체명 *</label>
-      <input id="r_업체명" type="text" placeholder="업체명 입력">
-    </div>
-    <div class="form-group">
-      <label>작업일자 *</label>
-      <input id="r_작업일자" type="date">
-    </div>
-    <div class="form-group">
-      <label>작업장소 및 설비명 *</label>
-      <input id="r_작업장소" type="text" placeholder="작업장소 및 설비명 입력">
-    </div>
-    <div class="form-group">
-      <label>위험요인 *</label>
-      <textarea id="r_위험요인" placeholder="위험요인 입력"></textarea>
-    </div>
-    <div class="form-group">
-      <label>안전대책 *</label>
-      <textarea id="r_안전대책" placeholder="안전대책 입력"></textarea>
-    </div>
-
-    <button class="submit-btn" id="submitBtn" onclick="submitRiskForm()">제출하기</button>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script>
-let history = [];
-let emailjsReady = false;
-
-async function initEmailJS() {
-  try {
-    const res = await fetch('/api/emailjs-key');
-    const data = await res.json();
-    emailjs.init(data.publicKey);
-    emailjsReady = true;
-  } catch(e) {}
-}
-initEmailJS();
-
-async function sendMsg() {
-  const input = document.getElementById('userInput');
-  const btn = document.getElementById('sendBtn');
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = '';
-  input.style.height = '42px';
-  btn.disabled = true;
-  addMsg('user', text);
-  history.push({ role: 'user', content: text });
-  showTyping();
-  try {
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: history })
-    });
-    const data = await res.json();
-    const reply = data.reply || '오류가 발생했습니다. 다시 시도해주세요.';
-    removeTyping();
-    addMsg('ai', reply);
-    history.push({ role: 'assistant', content: reply });
-  } catch(e) {
-    removeTyping();
-    addMsg('ai', '네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+// MSDS 데이터 구조
+const msds = {
+  '비트리': {
+    '원료': { '지립': { '알루미나': null, '실리콘카바이드': null }, '결합제': null },
+    '부재료': { '착색제': null, '점결제': null, '습윤제': null },
+    '기타': { '경화제': null, '도류': null, '세척제': null, '유류': null, '접착제': null, '합침제': null }
+  },
+  '레진': {
+    '원료': { '지립': { '실리콘카바이드': null, '알루미나': null, '알루미나-지르코니아': null }, '결합제': { '노볼락(분말)': null, '레졸(액상)': null } },
+    '부재료': { '보강재': null, '습윤제': null, '착색제': null, '충진제': null, '기공제': null },
+    '기타': { '도류': null, '세척제': null, '이형제': null, '접착제': null, '유류': null }
+  },
+  '초지립': {
+    '원료': { '지립': { '알루미나': null, '실리콘카바이드': null, 'CBN계(원반)': null, 'CBN계(고링)': null, 'DIA계(원반)': null, 'DIA계(고링)': null, 'DIA계(고링,높고링)': null }, '결합제': { '노볼락(분말)': null, '레졸(액상)': null } },
+    '부재료': { '습윤제': null, '충진제': null },
+    '기타': { '세척제': null, '유류': { '방청유': null, '유압유': null, '작동유': null, '절삭유': null }, '접착제': null }
+  },
+  '중연삭': {
+    '원료': { '지립': { '알루미나': null, '실리콘카바이드': null, '알루미나&지르코니아': null }, '결합제': { '노볼락(분말)': null } },
+    '부재료': { '보강재': null, '습윤제': null, '충진제': null },
+    '기타': { '도류': null, '세척제': null, '출습제': null, '유류': { '연료유': null, '작동유': null, '방청유': null }, '이형제': null, '접착제': null }
+  },
+  '소성': {
+    '기타': { '내화&단열제': null, '도류': null, '실리콘': null, '유류': { '윤활유': null, '방청유': null } }
+  },
+  '세공': {
+    '기타': { '부싱': null, '유류': { '연료유': null } }
+  },
+  '검사': {
+    '기타': { '도료': null, '세척제': null, '접착제': null, '탁도 시편': null }
+  },
+  '공무': {
+    '기타': { '연마석': { '절단용': null, '연마용': null }, '고압가스': null, '용접봉': { '일반용': null, '합금용': null }, '유류': { '작동유': null }, '도류': null }
   }
-  btn.disabled = false;
+};
+
+let path = [];
+
+function initMSDS() {
+  path = [];
+  renderMSDS();
 }
 
-function quickAsk(q) {
-  document.getElementById('userInput').value = q;
-  sendMsg();
-}
+function renderMSDS() {
+  const title = document.getElementById('msdsTitle');
+  const body = document.getElementById('msdsBody');
+  const backBtn = path.length > 0 ? '<button class="back-btn" onclick="goBack()">←</button> ' : '';
+  const pathStr = path.length > 0 ? path.join(' > ') : '공정 선택';
+  title.innerHTML = backBtn + '⚗️ ' + pathStr;
 
-function addMsg(role, text) {
-  const chat = document.getElementById('chat');
-  const div = document.createElement('div');
-  div.className = 'msg ' + (role === 'user' ? 'user' : 'ai');
-  if (role === 'ai') {
-    const label = document.createElement('div');
-    label.className = 'ai-label';
-    label.textContent = '안전 AI';
-    div.appendChild(label);
+  let current = msds;
+  for (const k of path) current = current[k];
+
+  if (current === null) {
+    // 파일 목록
+    const folderPath = path.join('/');
+    body.innerHTML = '<div class="grid1"><div class="file-link" onclick="openFolder(\'' + folderPath + '\')">📂 파일 목록 보기</div></div>';
+    return;
   }
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  bubble.textContent = text;
-  div.appendChild(bubble);
-  if (role === 'ai') {
-    const tags = document.createElement('div');
-    tags.className = 'tags';
-    tags.innerHTML = '<span class="tag tag-law">산업안전보건법</span><span class="tag tag-kosha">KOSHA 가이드</span>';
-    div.appendChild(tags);
-  }
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+
+  const keys = Object.keys(current);
+  const colorClass = path.length === 0 ? '' : path.length === 1 ? 'green' : 'orange';
+  body.innerHTML = '<div class="grid2">' + keys.map(k => '<button class="cat-btn ' + colorClass + '" onclick="goNext(\'' + k.replace(/'/g, "\\'") + '\')">' + k + '</button>').join('') + '</div>';
 }
 
-function showTyping() {
-  const chat = document.getElementById('chat');
-  const div = document.createElement('div');
-  div.className = 'msg ai';
-  div.id = 'typing';
-  const label = document.createElement('div');
-  label.className = 'ai-label';
-  label.textContent = '안전 AI';
-  div.appendChild(label);
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  bubble.innerHTML = '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
-  div.appendChild(bubble);
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
-
-function removeTyping() {
-  const el = document.getElementById('typing');
-  if (el) el.remove();
-}
-
-function showRiskForm() {
-  document.getElementById('riskModal').style.display = 'block';
-}
-
-function closeRiskForm() {
-  document.getElementById('riskModal').style.display = 'none';
-}
-
-async function submitRiskForm() {
-  const fields = {
-    '업체명': 'r_업체명',
-    '작업일자': 'r_작업일자',
-    '작업장소 및 설비명': 'r_작업장소',
-    '위험요인': 'r_위험요인',
-    '안전대책': 'r_안전대책'
-  };
-
-  const params = {};
-  for (const [label, id] of Object.entries(fields)) {
-    const val = document.getElementById(id).value.trim();
-    if (!val) { alert(label + '을(를) 입력해주세요.'); return; }
-    params[label] = val;
-  }
-  params['제출시간'] = new Date().toLocaleString('ko-KR');
-
-  const btn = document.getElementById('submitBtn');
-  btn.textContent = '제출 중...';
-  btn.disabled = true;
-
-  try {
-    const res = await fetch('/api/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params)
-    });
-    const data = await res.json();
-    if (data.success) {
-      alert('위험성 평가서가 제출되었습니다!');
-      closeRiskForm();
-      document.querySelectorAll('#riskModal input, #riskModal textarea').forEach(el => el.value = '');
-    } else {
-      alert('제출 실패. 다시 시도해주세요.');
-    }
-  } catch(e) {
-    alert('오류가 발생했습니다. 다시 시도해주세요.');
-  }
-  btn.textContent = '제출하기';
-  btn.disabled = false;
-}
- function toggleSafetyMenu() {
-  const menu = document.getElementById('safetyMenu');
-  const btn = document.getElementById('safetyMenuBtn');
-  if (menu.style.display === 'none' || menu.style.display === '') {
-    menu.style.display = 'flex';
-    btn.textContent = '📁 작업별 안전조치사항 ▲';
+function goNext(key) {
+  path.push(key);
+  let current = msds;
+  for (const k of path) current = current[k];
+  if (current === null) {
+    const folderPath = 'MSDS/' + path.join('/');
+    const body = document.getElementById('msdsBody');
+    const title = document.getElementById('msdsTitle');
+    title.innerHTML = '<button class="back-btn" onclick="goBack()">←</button> ⚗️ ' + path.join(' > ');
+    body.innerHTML = '<div class="grid1"><div class="file-link" onclick="openFolder(\'' + folderPath + '\')">📂 파일 목록 보기</div></div>';
   } else {
-    menu.style.display = 'none';
-    btn.textContent = '📁 작업별 안전조치사항 ▼';
+    renderMSDS();
   }
+}
+
+function goBack() {
+  path.pop();
+  renderMSDS();
+}
+
+function openFolder(folderPath) {
+  const encoded = folderPath.split('/').map(encodeURIComponent).join('/');
+  window.open('/' + encoded + '/', '_blank');
+}
+
+function togglePanel(id) {
+  const el = document.getElementById(id);
+  const isOpen = el.style.display === 'block';
+  el.style.display = isOpen ? 'none' : 'block';
+}
+
+function openPDF(url, title) {
+  document.getElementById('pdfTitle').textContent = title;
+  document.getElementById('pdfFrame').src = url;
+  document.getElementById('pdfDownload').href = url;
+  document.getElementById('pdfOverlay').classList.add('show');
+}
+
+function closePDF() {
+  document.getElementById('pdfOverlay').classList.remove('show');
+  document.getElementById('pdfFrame').src = '';
 }
 </script>
 </body>
