@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
       const fileName = path.split('/').pop();
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+      res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileName)}"`);
       const buffer = await fileRes.arrayBuffer();
       res.send(Buffer.from(buffer));
       return;
