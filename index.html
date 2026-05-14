@@ -22,19 +22,18 @@ body { font-family: -apple-system, sans-serif; background: #f0f2f5; min-height: 
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px; }
 .grid1 { display: flex; flex-direction: column; gap: 8px; padding: 12px; }
 .cat-btn { padding: 14px 10px; border: 1px solid #dde; border-radius: 8px; background: #f0f4ff; font-size: 13px; font-weight: 500; cursor: pointer; text-align: center; color: #2c3e7a; }
-.cat-btn:active { background: #dce3ff; }
 .cat-btn.green { background: #f0fff4; border-color: #b2dfdb; color: #1b5e3b; }
 .cat-btn.orange { background: #fff8f0; border-color: #ffcc99; color: #7a3c00; }
-.file-link { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #f8f8f8; border-radius: 8px; text-decoration: none; color: #333; font-size: 13px; border: 1px solid #eee; cursor: pointer; }
-.file-link:active { background: #efefef; }
-.safety-link { display: flex; align-items: center; gap: 10px; padding: 14px; background: #e8f0fe; border-radius: 10px; text-decoration: none; color: #1a4a7a; font-size: 14px; font-weight: 500; border: 1px solid #c5d8f8; cursor: pointer; }
-.safety-link:active { background: #d0e2fc; }
+.file-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #f8f8f8; border-radius: 8px; color: #333; font-size: 13px; border: 1px solid #eee; cursor: pointer; }
+.file-item:active { background: #efefef; }
+.safety-link { display: flex; align-items: center; gap: 10px; padding: 14px; background: #e8f0fe; border-radius: 10px; color: #1a4a7a; font-size: 14px; font-weight: 500; border: 1px solid #c5d8f8; cursor: pointer; }
+.loading { padding: 20px; text-align: center; color: #888; font-size: 13px; }
 .pdf-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; flex-direction: column; }
 .pdf-overlay.show { display: flex; }
 .pdf-bar { background: #1a4a7a; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
-.pdf-bar span { color: white; font-size: 14px; font-weight: 500; }
-.pdf-bar button { background: none; border: none; color: white; font-size: 26px; cursor: pointer; line-height: 1; }
-.pdf-bar a { color: #adf; font-size: 13px; text-decoration: none; }
+.pdf-bar span { color: white; font-size: 14px; font-weight: 500; flex: 1; }
+.pdf-bar a { color: #adf; font-size: 13px; text-decoration: none; margin-right: 12px; }
+.pdf-bar button { background: none; border: none; color: white; font-size: 26px; cursor: pointer; }
 iframe { flex: 1; width: 100%; border: none; }
 </style>
 </head>
@@ -50,7 +49,6 @@ iframe { flex: 1; width: 100%; border: none; }
 
 <div class="main">
 
-  <!-- 작업별 안전조치사항 -->
   <button class="menu-btn btn-blue" onclick="togglePanel('p1')">🦺 작업별 안전조치사항</button>
   <div class="sub-panel" id="p1">
     <div class="panel-title">🦺 작업별 안전조치사항</div>
@@ -62,123 +60,117 @@ iframe { flex: 1; width: 100%; border: none; }
     </div>
   </div>
 
-  <!-- MSDS -->
   <button class="menu-btn btn-teal" onclick="togglePanel('p2'); initMSDS()">⚗️ MSDS 조회</button>
   <div class="sub-panel" id="p2">
     <div class="panel-title" id="msdsTitle">⚗️ 공정 선택</div>
     <div id="msdsBody"></div>
   </div>
 
-  <!-- 안전보건매뉴얼 -->
   <button class="menu-btn btn-purple" onclick="openPDF('/safety-manual.pdf','안전보건매뉴얼')">📄 안전보건매뉴얼</button>
 
 </div>
 
-<!-- PDF 뷰어 -->
 <div class="pdf-overlay" id="pdfOverlay">
   <div class="pdf-bar">
     <span id="pdfTitle">문서</span>
-    <a id="pdfDownload" href="" download target="_blank">⬇ 다운로드</a>
+    <a id="pdfDownload" href="" target="_blank">⬇ 다운로드</a>
     <button onclick="closePDF()">✕</button>
   </div>
   <iframe id="pdfFrame" src=""></iframe>
 </div>
 
 <script>
-// MSDS 데이터 구조
-const msds = {
-  '비트리': {
-    '원료': { '지립': { '알루미나': null, '실리콘카바이드': null }, '결합제': null },
-    '부재료': { '착색제': null, '점결제': null, '습윤제': null },
-    '기타': { '경화제': null, '도류': null, '세척제': null, '유류': null, '접착제': null, '합침제': null }
-  },
-  '레진': {
-    '원료': { '지립': { '실리콘카바이드': null, '알루미나': null, '알루미나-지르코니아': null }, '결합제': { '노볼락(분말)': null, '레졸(액상)': null } },
-    '부재료': { '보강재': null, '습윤제': null, '착색제': null, '충진제': null, '기공제': null },
-    '기타': { '도류': null, '세척제': null, '이형제': null, '접착제': null, '유류': null }
-  },
-  '초지립': {
-    '원료': { '지립': { '알루미나': null, '실리콘카바이드': null, 'CBN계(원반)': null, 'CBN계(고링)': null, 'DIA계(원반)': null, 'DIA계(고링)': null, 'DIA계(고링,높고링)': null }, '결합제': { '노볼락(분말)': null, '레졸(액상)': null } },
-    '부재료': { '습윤제': null, '충진제': null },
-    '기타': { '세척제': null, '유류': { '방청유': null, '유압유': null, '작동유': null, '절삭유': null }, '접착제': null }
-  },
-  '중연삭': {
-    '원료': { '지립': { '알루미나': null, '실리콘카바이드': null, '알루미나&지르코니아': null }, '결합제': { '노볼락(분말)': null } },
-    '부재료': { '보강재': null, '습윤제': null, '충진제': null },
-    '기타': { '도류': null, '세척제': null, '출습제': null, '유류': { '연료유': null, '작동유': null, '방청유': null }, '이형제': null, '접착제': null }
-  },
-  '소성': {
-    '기타': { '내화&단열제': null, '도류': null, '실리콘': null, '유류': { '윤활유': null, '방청유': null } }
-  },
-  '세공': {
-    '기타': { '부싱': null, '유류': { '연료유': null } }
-  },
-  '검사': {
-    '기타': { '도료': null, '세척제': null, '접착제': null, '탁도 시편': null }
-  },
-  '공무': {
-    '기타': { '연마석': { '절단용': null, '연마용': null }, '고압가스': null, '용접봉': { '일반용': null, '합금용': null }, '유류': { '작동유': null }, '도류': null }
-  }
+const REPO = 'gsgjsh2049-del/safety-ai-app';
+const BRANCH = 'main';
+const API = 'https://api.github.com/repos/' + REPO + '/contents/';
+const RAW = 'https://raw.githubusercontent.com/' + REPO + '/' + BRANCH + '/';
+
+const msdsTree = {
+  '비트리': { '원료': { '지립': { '알루미나': null, '실리콘카바이드': null }, '결합제': null }, '부재료': { '착색제': null, '점결제': null, '습윤제': null }, '기타': { '경화제': null, '도류': null, '세척제': null, '유류': null, '접착제': null, '합침제': null } },
+  '레진': { '원료': { '지립': { '실리콘카바이드': null, '알루미나': null, '알루미나-지르코니아': null }, '결합제': { '노볼락(분말)': null, '레졸(액상)': null } }, '부재료': { '보강재': null, '습윤제': null, '착색제': null, '충진제': null, '기공제': null }, '기타': { '도류': null, '세척제': null, '이형제': null, '접착제': null, '유류': null } },
+  '초지립': { '원료': { '지립': { '알루미나': null, '실리콘카바이드': null, 'CBN계(원반)': null, 'CBN계(고링)': null, 'DIA계(원반)': null, 'DIA계(고링)': null, 'DIA계(고링,높고링)': null }, '결합제': { '노볼락(분말)': null, '레졸(액상)': null } }, '부재료': { '습윤제': null, '충진제': null }, '기타': { '세척제': null, '유류': { '방청유': null, '유압유': null, '작동유': null, '절삭유': null }, '접착제': null } },
+  '중연삭': { '원료': { '지립': { '알루미나': null, '실리콘카바이드': null, '알루미나&지르코니아': null }, '결합제': { '노볼락(분말)': null } }, '부재료': { '보강재': null, '습윤제': null, '충진제': null }, '기타': { '도류': null, '세척제': null, '출습제': null, '유류': { '연료유': null, '작동유': null, '방청유': null }, '이형제': null, '접착제': null } },
+  '소성': { '기타': { '내화&단열제': null, '도류': null, '실리콘': null, '유류': { '윤활유': null, '방청유': null } } },
+  '세공': { '기타': { '부싱': null, '유류': { '연료유': null } } },
+  '검사': { '기타': { '도료': null, '세척제': null, '접착제': null, '탁도 시편': null } },
+  '공무': { '기타': { '연마석': { '절단용': null, '연마용': null }, '고압가스': null, '용접봉': { '일반용': null, '합금용': null }, '유류': { '작동유': null }, '도류': null } }
 };
 
-let path = [];
+let mPath = [];
+let panelOpen = {};
+
+function togglePanel(id) {
+  const el = document.getElementById(id);
+  const isOpen = panelOpen[id];
+  el.style.display = isOpen ? 'none' : 'block';
+  panelOpen[id] = !isOpen;
+}
 
 function initMSDS() {
-  path = [];
-  renderMSDS();
+  if (mPath.length === 0) {
+    mPath = [];
+    renderMSDS();
+  }
 }
 
 function renderMSDS() {
   const title = document.getElementById('msdsTitle');
   const body = document.getElementById('msdsBody');
-  const backBtn = path.length > 0 ? '<button class="back-btn" onclick="goBack()">←</button> ' : '';
-  const pathStr = path.length > 0 ? path.join(' > ') : '공정 선택';
-  title.innerHTML = backBtn + '⚗️ ' + pathStr;
+  const backBtn = mPath.length > 0 ? '<button class="back-btn" onclick="goBack()">←</button> ' : '';
+  title.innerHTML = backBtn + '⚗️ ' + (mPath.length > 0 ? mPath.join(' > ') : '공정 선택');
 
-  let current = msds;
-  for (const k of path) current = current[k];
+  let cur = msdsTree;
+  for (const k of mPath) cur = cur[k];
 
-  if (current === null) {
-    // 파일 목록
-    const folderPath = path.join('/');
-    body.innerHTML = '<div class="grid1"><div class="file-link" onclick="openFolder(\'' + folderPath + '\')">📂 파일 목록 보기</div></div>';
+  if (cur === null) {
+    loadFiles();
     return;
   }
 
-  const keys = Object.keys(current);
-  const colorClass = path.length === 0 ? '' : path.length === 1 ? 'green' : 'orange';
-  body.innerHTML = '<div class="grid2">' + keys.map(k => '<button class="cat-btn ' + colorClass + '" onclick="goNext(\'' + k.replace(/'/g, "\\'") + '\')">' + k + '</button>').join('') + '</div>';
+  const keys = Object.keys(cur);
+  const cls = mPath.length === 0 ? '' : mPath.length === 1 ? 'green' : 'orange';
+  body.innerHTML = '<div class="grid2">' + keys.map(k => `<button class="cat-btn ${cls}" onclick="goNext('${k.replace(/'/g, "\\'")}')">${k}</button>`).join('') + '</div>';
 }
 
 function goNext(key) {
-  path.push(key);
-  let current = msds;
-  for (const k of path) current = current[k];
-  if (current === null) {
-    const folderPath = 'MSDS/' + path.join('/');
-    const body = document.getElementById('msdsBody');
-    const title = document.getElementById('msdsTitle');
-    title.innerHTML = '<button class="back-btn" onclick="goBack()">←</button> ⚗️ ' + path.join(' > ');
-    body.innerHTML = '<div class="grid1"><div class="file-link" onclick="openFolder(\'' + folderPath + '\')">📂 파일 목록 보기</div></div>';
-  } else {
-    renderMSDS();
-  }
+  mPath.push(key);
+  let cur = msdsTree;
+  for (const k of mPath) cur = cur[k];
+  if (cur === null) loadFiles();
+  else renderMSDS();
 }
 
 function goBack() {
-  path.pop();
+  mPath.pop();
   renderMSDS();
 }
 
-function openFolder(folderPath) {
-  const encoded = folderPath.split('/').map(encodeURIComponent).join('/');
-  window.open('/' + encoded + '/', '_blank');
-}
+async function loadFiles() {
+  const body = document.getElementById('msdsBody');
+  const title = document.getElementById('msdsTitle');
+  title.innerHTML = '<button class="back-btn" onclick="goBack()">←</button> ⚗️ ' + mPath.join(' > ');
+  body.innerHTML = '<div class="loading">📂 파일 목록 불러오는 중...</div>';
 
-function togglePanel(id) {
-  const el = document.getElementById(id);
-  const isOpen = el.style.display === 'block';
-  el.style.display = isOpen ? 'none' : 'block';
+  const folderPath = 'MSDS/' + mPath.join('/');
+  const encoded = folderPath.split('/').map(encodeURIComponent).join('/');
+
+  try {
+    const res = await fetch(API + encoded + '?ref=' + BRANCH);
+    const files = await res.json();
+    const pdfs = files.filter(f => f.name.endsWith('.pdf'));
+
+    if (pdfs.length === 0) {
+      body.innerHTML = '<div class="loading">파일이 없습니다.</div>';
+      return;
+    }
+
+    body.innerHTML = '<div class="grid1">' + pdfs.map(f => {
+      const url = RAW + encoded + '/' + encodeURIComponent(f.name);
+      return `<div class="file-item" onclick="openPDF('${url}','${f.name.replace('.pdf','').replace(/'/g,"\\'")}')">📄 ${f.name.replace('.pdf','')}</div>`;
+    }).join('') + '</div>';
+  } catch(e) {
+    body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
+  }
 }
 
 function openPDF(url, title) {
