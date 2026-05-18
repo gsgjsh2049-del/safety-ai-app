@@ -178,9 +178,9 @@ async function loadFiles() {
 
 function openPDF(filePath, title) {
   const baseUrl = '/api/msds?path=' + encodeURIComponent(filePath);
+  const isIphone = /iPhone/i.test(navigator.userAgent);
 
   document.getElementById('pdfTitle').textContent = title;
-  document.getElementById('pdfFrame').src = baseUrl + '&preview=true';
 
   const dlBtn = document.getElementById('pdfDownload');
   dlBtn.href = baseUrl + '&download=true';
@@ -188,6 +188,14 @@ function openPDF(filePath, title) {
   dlBtn.target = '_blank';
   dlBtn.rel = 'noopener noreferrer';
 
+  if (isIphone) {
+    // 아이폰: 새 탭으로 열기 → Safari 기본 PDF 뷰어 (전체 페이지 스크롤 가능)
+    window.open(baseUrl + '&preview=true', '_blank');
+    return;
+  }
+
+  // 컴퓨터, 갤럭시: 오버레이로 미리보기
+  document.getElementById('pdfFrame').src = baseUrl + '&preview=true';
   document.getElementById('pdfOverlay').classList.add('show');
 }
 
