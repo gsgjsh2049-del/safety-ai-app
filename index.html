@@ -17,6 +17,7 @@ body { font-family: -apple-system, sans-serif; background: #f0f2f5; min-height: 
 .btn-teal { background: #16a085; }
 .btn-purple { background: #8e44ad; }
 .btn-orange { background: #e67e22; }
+.btn-green { background: #27ae60; }
 .sub-panel { display: none; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
 .panel-title { padding: 12px 16px; background: #f8f8f8; border-bottom: 1px solid #eee; font-size: 13px; font-weight: 600; color: #444; display: flex; align-items: center; gap: 8px; }
 .back-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #666; line-height: 1; }
@@ -69,6 +70,7 @@ iframe { flex: 1; width: 100%; border: none; }
 
   <button class="menu-btn btn-purple" onclick="openPDF('/safety-manual.pdf','안전보건매뉴얼')">📄 안전보건매뉴얼</button>
   <button class="menu-btn btn-orange" onclick="openPDF('개선제안 현황.pdf','개선제안 현황')">📋 개선제안 현황</button>
+  <button class="menu-btn btn-green" onclick="togglePanel('p3'); initEdu()">📚 안전교육자료</button>
 </div>
 
 <div class="pdf-overlay" id="pdfOverlay">
