@@ -325,14 +325,14 @@ function openPolicy() {
     return;
   }
 
-  // 컴퓨터, 갤럭시: 팝업으로 표시
   const overlay = document.createElement('div');
+  overlay.id = 'policyOverlay';
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:999;display:flex;flex-direction:column;';
 
   overlay.innerHTML = `
     <div style="background:#1a4a7a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
       <span style="color:white;font-size:14px;font-weight:500;">안전보건 경영방침</span>
-      <button onclick="this.closest('div[style]').remove()" style="background:none;border:none;color:white;font-size:26px;cursor:pointer;">✕</button>
+      <button onclick="closePolicy()" style="background:none;border:none;color:white;font-size:26px;cursor:pointer;">✕</button>
     </div>
     <div style="flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:16px;">
       <img src="${url}" style="max-width:100%;max-height:100%;border-radius:8px;">
@@ -340,7 +340,21 @@ function openPolicy() {
   `;
 
   document.body.appendChild(overlay);
+
+  // 뒤로가기 감지용 history 등록
+  history.pushState({ policy: true }, '');
 }
+
+function closePolicy() {
+  const overlay = document.getElementById('policyOverlay');
+  if (overlay) overlay.remove();
+}
+
+// 뒤로가기 누르면 팝업 닫기
+window.addEventListener('popstate', function(e) {
+  const overlay = document.getElementById('policyOverlay');
+  if (overlay) overlay.remove();
+});
 </script>
 </body>
 </html>
