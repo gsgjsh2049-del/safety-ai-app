@@ -366,31 +366,16 @@ let forkliftPanelInit = false;
 function initForklift() {
   if (!forkliftPanelInit) {
     forkliftPanelInit = true;
-    renderForklift();
+    loadForkliftFiles();
   }
 }
 
-function renderForklift() {
-  const title = document.getElementById('forkliftTitle');
+async function loadForkliftFiles() {
   const body = document.getElementById('forkliftBody');
-  title.innerHTML = '🚜 지게차 관리';
-  body.innerHTML = `
-    <div class="grid2" style="padding:12px;">
-      <button class="cat-btn green" onclick="loadForkliftFiles('지게차 운전자격 정리')">지게차 운전자격 정리</button>
-      <button class="cat-btn green" onclick="loadForkliftFiles('지게차&운전자 현황')">지게차&운전자 현황</button>
-    </div>`;
-}
-
-async function loadForkliftFiles(folder) {
-  const body = document.getElementById('forkliftBody');
-  const title = document.getElementById('forkliftTitle');
-  title.innerHTML = `<button class="back-btn" onclick="resetForklift()">←</button> 🚜 ${folder}`;
   body.innerHTML = '<div class="loading">📂 파일 목록 불러오는 중...</div>';
 
-  const folderPath = '지게차 관리/' + folder;
-
   try {
-    const res = await fetch('/api/msds?path=' + encodeURIComponent(folderPath));
+    const res = await fetch('/api/msds?path=' + encodeURIComponent('지게차 관리'));
     const files = await res.json();
 
     if (!Array.isArray(files)) {
@@ -406,7 +391,7 @@ async function loadForkliftFiles(folder) {
     }
 
     body.innerHTML = '<div class="grid1">' + pdfs.map(f => {
-      const filePath = folderPath + '/' + f.name;
+      const filePath = '지게차 관리/' + f.name;
       const displayName = f.name.replace('.pdf', '');
       return `<div class="file-item" onclick="openPDF('${filePath.replace(/'/g,"\\'")}','${displayName.replace(/'/g,"\\'")}')">📄 ${displayName}</div>`;
     }).join('') + '</div>';
@@ -414,11 +399,6 @@ async function loadForkliftFiles(folder) {
   } catch(e) {
     body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
   }
-}
-
-function resetForklift() {
-  forkliftPanelInit = false;
-  initForklift();
 }
 </script>
 </body>
