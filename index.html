@@ -419,7 +419,8 @@ async function loadForkliftFiles() {
     body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
   }
 }
-  function calcHeatIndex() {
+  calcHeatIndex() 함수가 중간에 잘렸어요. 함수 전체를 이걸로 교체하세요:
+jsfunction calcHeatIndex() {
   const T = parseFloat(document.getElementById('tempInput').value);
   const R = parseFloat(document.getElementById('humidInput').value);
   const result = document.getElementById('heatResult');
@@ -429,10 +430,26 @@ async function loadForkliftFiles() {
     return;
   }
 
-  // 열지수 공식
   const HIC = -2.2519 + 0.8396*T + 0.0842*R + 0.0007*T*T + 0.0018*T*R - 0.0004*R*R;
 
-  let color, label, desc;
+  let color, label;
+  if (HIC < 27) {
+    color = '#d4edda'; label = '😊 안전';
+  } else if (HIC < 32) {
+    color = '#fff3cd'; label = '⚠️ 수분섭취 필요';
+  } else if (HIC < 41) {
+    color = '#ffd6a5'; label = '🔶 냉방기 등을 활용하여 체감온도를 낮추세요';
+  } else if (HIC < 54) {
+    color = '#ffb3b3'; label = '🔴 휴식을 취하세요';
+  } else {
+    color = '#c0392b'; label = '☠️ 매우 위험';
+  }
+
+  result.innerHTML = `
+    <div class="calc-result" style="background:${color}; color:#333;">
+      <div style="font-size:20px; margin-bottom:6px;">${label}</div>
+      <div style="font-size:24px; font-weight:700;">열지수 ${HIC.toFixed(1)}°C</div>
+    </div>`;
 }
 </script>
 </body>
