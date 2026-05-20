@@ -419,8 +419,7 @@ async function loadForkliftFiles() {
     body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
   }
 }
-  calcHeatIndex() 함수가 중간에 잘렸어요. 함수 전체를 이걸로 교체하세요:
-jsfunction calcHeatIndex() {
+function calcHeatIndex() {
   const T = parseFloat(document.getElementById('tempInput').value);
   const R = parseFloat(document.getElementById('humidInput').value);
   const result = document.getElementById('heatResult');
