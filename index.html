@@ -20,6 +20,9 @@ body { font-family: -apple-system, sans-serif; background: #f0f2f5; min-height: 
 .btn-green { background: #27ae60; }
 .btn-red { background: #c0392b; }
 .btn-darkblue { background: #2980b9; }
+.btn-yellow { background: #f39c12; }
+.calc-input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-top: 4px; }
+.calc-result { margin: 12px; padding: 14px; border-radius: 10px; text-align: center; font-size: 15px; font-weight: 600; }
 .sub-panel { display: none; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
 .panel-title { padding: 12px 16px; background: #f8f8f8; border-bottom: 1px solid #eee; font-size: 13px; font-weight: 600; color: #444; display: flex; align-items: center; gap: 8px; }
 .back-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #666; line-height: 1; }
@@ -84,6 +87,22 @@ iframe { flex: 1; width: 100%; border: none; }
 <div class="sub-panel" id="p5">
   <div class="panel-title" id="forkliftTitle">🚜 지게차 관리</div>
   <div id="forkliftBody"></div>
+</div>
+  <button class="menu-btn btn-yellow" onclick="togglePanel('p6')">🌡️ 체감온도 계산기</button>
+<div class="sub-panel" id="p6">
+  <div class="panel-title">🌡️ 열지수 계산기 (더위)</div>
+  <div style="padding:12px; display:flex; flex-direction:column; gap:10px;">
+    <div>
+      <label style="font-size:13px; color:#555;">기온 (°C)</label>
+      <input class="calc-input" type="number" id="tempInput" placeholder="예: 33">
+    </div>
+    <div>
+      <label style="font-size:13px; color:#555;">상대습도 (%)</label>
+      <input class="calc-input" type="number" id="humidInput" placeholder="예: 70">
+    </div>
+    <button onclick="calcHeatIndex()" style="padding:12px; background:#f39c12; color:white; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">계산하기</button>
+    <div id="heatResult"></div>
+  </div>
 </div>
 </div>  
 
@@ -399,6 +418,39 @@ async function loadForkliftFiles() {
   } catch(e) {
     body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
   }
+}
+  function calcHeatIndex() {
+  const T = parseFloat(document.getElementById('tempInput').value);
+  const R = parseFloat(document.getElementById('humidInput').value);
+  const result = document.getElementById('heatResult');
+
+  if (isNaN(T) || isNaN(R)) {
+    result.innerHTML = '<div class="calc-result" style="background:#fff3cd; color:#856404;">기온과 습도를 입력해주세요.</div>';
+    return;
+  }
+
+  // 열지수 공식
+  const HIC = -2.2519 + 0.8396*T + 0.0842*R + 0.0007*T*T + 0.0018*T*R - 0.0004*R*R;
+
+  let color, label, desc;
+  if (HIC < 27) {
+    color = '#d4edda'; label = '😊 안전'; desc = '쾌적한 상태입니다.';
+  } else if (HIC < 32) {
+    color = '#fff3cd'; label = '⚠️ 주의'; desc = '장시간 야외작업 시 수분 보충이 필요합니다.';
+  } else if (HIC < 41) {
+    color = '#ffd6a5'; label = '🔶 경고'; desc = '열경련·열탈진 가능성이 있습니다. 휴식을 취하세요.';
+  } else if (HIC < 54) {
+    color = '#ffb3b3'; label = '🔴 위험'; desc = '열사병 위험이 높습니다. 즉시 시원한 곳으로 이동하세요.';
+  } else {
+    color = '#c0392b'; label = '☠️ 매우 위험'; desc = '생명에 위협적인 수준입니다. 야외작업을 중단하세요.';
+  }
+
+  result.innerHTML = `
+    <div class="calc-result" style="background:${color}; color:#333;">
+      <div style="font-size:20px; margin-bottom:6px;">${label}</div>
+      <div style="font-size:24px; font-weight:700; margin-bottom:6px;">열지수 ${HIC.toFixed(1)}°C</div>
+      <div style="font-size:13px; font-weight:400;">${desc}</div>
+    </div>`;
 }
 </script>
 </body>
