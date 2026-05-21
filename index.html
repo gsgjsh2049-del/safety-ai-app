@@ -419,7 +419,7 @@ async function loadForkliftFiles() {
     body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
   }
 }
-  function calcHeatIndex() {
+function calcHeatIndex() {
   const T = parseFloat(document.getElementById('tempInput').value);
   const R = parseFloat(document.getElementById('humidInput').value);
   const result = document.getElementById('heatResult');
@@ -429,27 +429,25 @@ async function loadForkliftFiles() {
     return;
   }
 
-  // 열지수 공식
   const HIC = -2.2519 + 0.8396*T + 0.0842*R + 0.0007*T*T + 0.0018*T*R - 0.0004*R*R;
 
-  let color, label, desc;
+  let color, label;
   if (HIC < 27) {
-    color = '#d4edda'; label = '😊 안전'; desc = '쾌적한 상태입니다.';
+    color = '#d4edda'; label = '😊 안전';
   } else if (HIC < 32) {
-    color = '#fff3cd'; label = '⚠️ 주의'; desc = '장시간 야외작업 시 수분 보충이 필요합니다.';
+    color = '#fff3cd'; label = '⚠️ 수분섭취 필요';
   } else if (HIC < 41) {
-    color = '#ffd6a5'; label = '🔶 경고'; desc = '열경련·열탈진 가능성이 있습니다. 휴식을 취하세요.';
+    color = '#ffd6a5'; label = '🔶 냉방기 등을 활용하여 체감온도를 낮추세요';
   } else if (HIC < 54) {
-    color = '#ffb3b3'; label = '🔴 위험'; desc = '열사병 위험이 높습니다. 즉시 시원한 곳으로 이동하세요.';
+    color = '#ffb3b3'; label = '🔴 휴식을 취하세요';
   } else {
-    color = '#c0392b'; label = '☠️ 매우 위험'; desc = '생명에 위협적인 수준입니다. 야외작업을 중단하세요.';
+    color = '#c0392b'; label = '☠️ 매우 위험';
   }
 
   result.innerHTML = `
     <div class="calc-result" style="background:${color}; color:#333;">
       <div style="font-size:20px; margin-bottom:6px;">${label}</div>
-      <div style="font-size:24px; font-weight:700; margin-bottom:6px;">열지수 ${HIC.toFixed(1)}°C</div>
-      <div style="font-size:13px; font-weight:400;">${desc}</div>
+      <div style="font-size:24px; font-weight:700;">열지수 ${HIC.toFixed(1)}°C</div>
     </div>`;
 }
 </script>
