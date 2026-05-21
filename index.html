@@ -21,6 +21,7 @@ body { font-family: -apple-system, sans-serif; background: #f0f2f5; min-height: 
 .btn-red { background: #c0392b; }
 .btn-darkblue { background: #2980b9; }
 .btn-yellow { background: #f39c12; }
+.btn-brown { background: #795548; }
 .calc-input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-top: 4px; }
 .calc-result { margin: 12px; padding: 14px; border-radius: 10px; text-align: center; font-size: 15px; font-weight: 600; }
 .sub-panel { display: none; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
@@ -77,17 +78,20 @@ iframe { flex: 1; width: 100%; border: none; }
   <div class="panel-title" id="manualTitle">📄 안전보건매뉴얼</div>
   <div id="manualBody"></div>
 </div>
+  
   <button class="menu-btn btn-orange" onclick="openPDF('개선제안 현황.pdf','개선제안 현황')">📋 개선제안 현황</button>
   <button class="menu-btn btn-green" onclick="togglePanel('p3'); initEdu()">📚 안전교육자료</button>
   <div class="sub-panel" id="p3">
   <div class="panel-title" id="eduTitle">📚 안전교육자료</div>
   <div id="eduBody"></div>
  </div>
+  
   <button class="menu-btn btn-darkblue" onclick="togglePanel('p5'); initForklift()">🚜 지게차 관리</button>
 <div class="sub-panel" id="p5">
   <div class="panel-title" id="forkliftTitle">🚜 지게차 관리</div>
   <div id="forkliftBody"></div>
 </div>
+  
   <button class="menu-btn btn-yellow" onclick="togglePanel('p6')">🌡️ 체감온도 계산기</button>
 <div class="sub-panel" id="p6">
   <div class="panel-title">🌡️ 열지수 계산기 (더위)</div>
@@ -103,6 +107,13 @@ iframe { flex: 1; width: 100%; border: none; }
     <button onclick="calcHeatIndex()" style="padding:12px; background:#f39c12; color:white; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">계산하기</button>
     <div id="heatResult"></div>
   </div>
+
+  <button class="menu-btn btn-brown" onclick="togglePanel('p7'); initInspection()">🔍 안전보건 합동점검</button>
+<div class="sub-panel" id="p7">
+  <div class="panel-title" id="inspectionTitle">🔍 안전보건 합동점검</div>
+  <div id="inspectionBody"></div>
+</div>
+  
 </div>
 </div>  
 
