@@ -107,7 +107,7 @@ iframe { flex: 1; width: 100%; border: none; }
     <button onclick="calcHeatIndex()" style="padding:12px; background:#f39c12; color:white; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">계산하기</button>
     <div id="heatResult"></div>
   </div>
-
+</div>
   <button class="menu-btn btn-brown" onclick="togglePanel('p7'); initInspection()">🔍 안전보건 합동점검</button>
 <div class="sub-panel" id="p7">
   <div class="panel-title" id="inspectionTitle">🔍 안전보건 합동점검</div>
@@ -460,7 +460,7 @@ function calcHeatIndex() {
       <div style="font-size:24px; font-weight:700;">열지수 ${HIC.toFixed(1)}°C</div>
     </div>`;
 }
-  const INSPECTION_PASSWORDS = {
+const INSPECTION_PASSWORDS = {
   '비트리': '1111',
   '레진': '2222',
   '세공': '3333',
