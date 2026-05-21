@@ -108,9 +108,9 @@ iframe { flex: 1; width: 100%; border: none; }
     <div id="heatResult"></div>
   </div>
 </div>
-  <button class="menu-btn btn-brown" onclick="togglePanel('p7'); initInspection()">🔍 안전보건 합동점검</button>
+  <button class="menu-btn btn-brown" onclick="togglePanel('p7'); initInspection()">🔍 안전합동점검</button>
 <div class="sub-panel" id="p7">
-  <div class="panel-title" id="inspectionTitle">🔍 안전보건 합동점검</div>
+  <div class="panel-title" id="inspectionTitle">🔍 안전합동점검</div>
   <div id="inspectionBody"></div>
  </div> 
 </div>
@@ -482,11 +482,11 @@ function initInspection() {
 async function loadInspectionDates() {
   const body = document.getElementById('inspectionBody');
   const title = document.getElementById('inspectionTitle');
-  title.innerHTML = '🔍 안전보건 합동점검';
+  title.innerHTML = '🔍 안전합동점검';
   body.innerHTML = '<div class="loading">📂 날짜 목록 불러오는 중...</div>';
 
   try {
-    const res = await fetch('/api/msds?path=' + encodeURIComponent('안전보건 합동점검'));
+    const res = await fetch('/api/msds?path=' + encodeURIComponent('안전합동점검'));
     const items = await res.json();
 
     if (!Array.isArray(items)) {
@@ -517,7 +517,7 @@ async function loadInspectionProcesses(date) {
   body.innerHTML = '<div class="loading">📂 공정 목록 불러오는 중...</div>';
 
   try {
-    const res = await fetch('/api/msds?path=' + encodeURIComponent('안전보건 합동점검/' + date));
+    const res = await fetch('/api/msds?path=' + encodeURIComponent('안전합동점검/' + date));
     const items = await res.json();
 
     if (!Array.isArray(items)) {
@@ -563,7 +563,7 @@ async function loadInspectionFiles(date, process) {
   title.innerHTML = `<button class="back-btn" onclick="loadInspectionProcesses('${date}')">←</button> 🔍 ${date} > ${process}`;
   body.innerHTML = '<div class="loading">📂 파일 목록 불러오는 중...</div>';
 
-  const folderPath = '안전보건 합동점검/' + date + '/' + process;
+  const folderPath = '안전합동점검/' + date + '/' + process;
 
   try {
     const res = await fetch('/api/msds?path=' + encodeURIComponent(folderPath));
