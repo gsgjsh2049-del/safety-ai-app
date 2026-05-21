@@ -461,6 +461,137 @@ function calcHeatIndex() {
       <div style="font-size:24px; font-weight:700;">열지수 ${HIC.toFixed(1)}°C</div>
     </div>`;
 }
+  const INSPECTION_PASSWORDS = {
+  '비트리': '1111',
+  '레진': '2222',
+  '세공': '3333',
+  '검사': '4444',
+  '중연삭': '5555',
+  'G1산업': '6666'
+};
+
+let inspectionPanelInit = false;
+let inspectionDates = [];
+
+function initInspection() {
+  if (!inspectionPanelInit) {
+    inspectionPanelInit = true;
+    loadInspectionDates();
+  }
+}
+
+async function loadInspectionDates() {
+  const body = document.getElementById('inspectionBody');
+  const title = document.getElementById('inspectionTitle');
+  title.innerHTML = '🔍 안전보건 합동점검';
+  body.innerHTML = '<div class="loading">📂 날짜 목록 불러오는 중...</div>';
+
+  try {
+    const res = await fetch('/api/msds?path=' + encodeURIComponent('안전보건 합동점검'));
+    const items = await res.json();
+
+    if (!Array.isArray(items)) {
+      body.innerHTML = '<div class="loading">불러올 수 없습니다.</div>';
+      return;
+    }
+
+    const folders = items.filter(f => f.type === 'dir');
+
+    if (folders.length === 0) {
+      body.innerHTML = '<div class="loading">데이터가 없습니다.</div>';
+      return;
+    }
+
+    body.innerHTML = '<div class="grid2" style="padding:12px;">' +
+      folders.map(f => `<button class="cat-btn" onclick="loadInspectionProcesses('${f.name}')">${f.name}</button>`).join('') +
+      '</div>';
+
+  } catch(e) {
+    body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
+  }
+}
+
+async function loadInspectionProcesses(date) {
+  const body = document.getElementById('inspectionBody');
+  const title = document.getElementById('inspectionTitle');
+  title.innerHTML = `<button class="back-btn" onclick="loadInspectionDates()">←</button> 🔍 ${date}`;
+  body.innerHTML = '<div class="loading">📂 공정 목록 불러오는 중...</div>';
+
+  try {
+    const res = await fetch('/api/msds?path=' + encodeURIComponent('안전보건 합동점검/' + date));
+    const items = await res.json();
+
+    if (!Array.isArray(items)) {
+      body.innerHTML = '<div class="loading">불러올 수 없습니다.</div>';
+      return;
+    }
+
+    const folders = items.filter(f => f.type === 'dir');
+
+    if (folders.length === 0) {
+      body.innerHTML = '<div class="loading">공정 폴더가 없습니다.</div>';
+      return;
+    }
+
+    body.innerHTML = '<div class="grid2" style="padding:12px;">' +
+      folders.map(f => `<button class="cat-btn green" onclick="checkInspectionPassword('${date}','${f.name}')">${f.name}</button>`).join('') +
+      '</div>';
+
+  } catch(e) {
+    body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
+  }
+}
+
+function checkInspectionPassword(date, process) {
+  const correct = INSPECTION_PASSWORDS[process];
+  if (!correct) {
+    loadInspectionFiles(date, process);
+    return;
+  }
+
+  const input = prompt(`[${process}] 비밀번호를 입력하세요:`);
+  if (input === null) return;
+  if (input === correct) {
+    loadInspectionFiles(date, process);
+  } else {
+    alert('비밀번호가 틀렸습니다.');
+  }
+}
+
+async function loadInspectionFiles(date, process) {
+  const body = document.getElementById('inspectionBody');
+  const title = document.getElementById('inspectionTitle');
+  title.innerHTML = `<button class="back-btn" onclick="loadInspectionProcesses('${date}')">←</button> 🔍 ${date} > ${process}`;
+  body.innerHTML = '<div class="loading">📂 파일 목록 불러오는 중...</div>';
+
+  const folderPath = '안전보건 합동점검/' + date + '/' + process;
+
+  try {
+    const res = await fetch('/api/msds?path=' + encodeURIComponent(folderPath));
+    const files = await res.json();
+
+    if (!Array.isArray(files)) {
+      body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
+      return;
+    }
+
+    const pdfs = files.filter(f => f.name.endsWith('.pdf'));
+
+    if (pdfs.length === 0) {
+      body.innerHTML = '<div class="loading">파일이 없습니다.</div>';
+      return;
+    }
+
+    body.innerHTML = '<div class="grid1">' + pdfs.map(f => {
+      const filePath = folderPath + '/' + f.name;
+      const displayName = f.name.replace('.pdf', '');
+      return `<div class="file-item" onclick="openPDF('${filePath.replace(/'/g,"\\'")}','${displayName.replace(/'/g,"\\'")}')">📄 ${displayName}</div>`;
+    }).join('') + '</div>';
+
+  } catch(e) {
+    body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
+  }
+}
 </script>
 </body>
 </html>
