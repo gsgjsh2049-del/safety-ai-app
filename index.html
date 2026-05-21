@@ -11,19 +11,27 @@ body { font-family: -apple-system, sans-serif; background: #f0f2f5; min-height: 
 .header img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
 .header h1 { font-size: 15px; font-weight: 600; }
 .header p { font-size: 11px; opacity: 0.75; margin-top: 2px; }
-.main { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-.menu-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; color: white; text-align: left; }
-.btn-blue { background: #1a4a7a; }
-.btn-teal { background: #16a085; }
-.btn-purple { background: #8e44ad; }
-.btn-orange { background: #e67e22; }
-.btn-green { background: #27ae60; }
-.btn-red { background: #c0392b; }
-.btn-darkblue { background: #2980b9; }
-.btn-yellow { background: #f39c12; }
-.calc-input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-top: 4px; }
-.calc-result { margin: 12px; padding: 14px; border-radius: 10px; text-align: center; font-size: 15px; font-weight: 600; }
-.sub-panel { display: none; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+
+/* 아이콘 그리드 */
+.icon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; }
+.icon-btn { display: flex; flex-direction: column; align-items: center; gap: 8px; background: none; border: none; cursor: pointer; padding: 0; }
+.icon-circle { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: transform 0.1s; }
+.icon-btn:active .icon-circle { transform: scale(0.92); }
+.icon-label { font-size: 11px; font-weight: 600; color: #333; text-align: center; line-height: 1.3; word-break: keep-all; }
+
+/* 색상 */
+.ic-red { background: #c0392b; }
+.ic-blue { background: #1a4a7a; }
+.ic-teal { background: #16a085; }
+.ic-purple { background: #8e44ad; }
+.ic-orange { background: #e67e22; }
+.ic-green { background: #27ae60; }
+.ic-darkblue { background: #2980b9; }
+.ic-yellow { background: #f39c12; }
+.ic-brown { background: #795548; }
+
+/* 패널 */
+.sub-panel { display: none; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin: 0 16px 12px; }
 .panel-title { padding: 12px 16px; background: #f8f8f8; border-bottom: 1px solid #eee; font-size: 13px; font-weight: 600; color: #444; display: flex; align-items: center; gap: 8px; }
 .back-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #666; line-height: 1; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px; }
@@ -35,6 +43,12 @@ body { font-family: -apple-system, sans-serif; background: #f0f2f5; min-height: 
 .file-item:active { background: #efefef; }
 .safety-link { display: flex; align-items: center; gap: 10px; padding: 14px; background: #e8f0fe; border-radius: 10px; color: #1a4a7a; font-size: 14px; font-weight: 500; border: 1px solid #c5d8f8; cursor: pointer; }
 .loading { padding: 20px; text-align: center; color: #888; font-size: 13px; }
+
+/* 계산기 */
+.calc-input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-top: 4px; }
+.calc-result { margin: 12px; padding: 14px; border-radius: 10px; text-align: center; font-size: 15px; font-weight: 600; }
+
+/* PDF 오버레이 */
 .pdf-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; flex-direction: column; }
 .pdf-overlay.show { display: flex; }
 .pdf-bar { background: #1a4a7a; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
@@ -53,42 +67,85 @@ iframe { flex: 1; width: 100%; border: none; }
     <p>현장 안전보건 정보 제공 시스템</p>
   </div>
 </div>
-<div class="main">
-  <button class="menu-btn btn-red" onclick="openPolicy()">📋 안전보건 경영방침</button>
-  <button class="menu-btn btn-blue" onclick="togglePanel('p1')">🦺 작업별 안전조치사항</button>
-  <div class="sub-panel" id="p1">
-    <div class="panel-title">🦺 작업별 안전조치사항</div>
-    <div class="grid1">
-      <div class="safety-link" onclick="openPDF('/work-height.pdf','고소작업')">🔺 고소작업</div>
-      <div class="safety-link" onclick="openPDF('/forklift.pdf','지게차 작업')">🚜 지게차 작업</div>
-      <div class="safety-link" onclick="openPDF('/fire-work.pdf','화기작업')">🔥 화기작업</div>
-      <div class="safety-link" onclick="openPDF('/equipment-check.pdf','설비점검')">🔧 설비점검</div>
-    </div>
-  </div>
 
-  <button class="menu-btn btn-teal" onclick="togglePanel('p2'); initMSDS()">⚗️ MSDS 조회</button>
-  <div class="sub-panel" id="p2">
-    <div class="panel-title" id="msdsTitle">⚗️ 공정 선택</div>
-    <div id="msdsBody"></div>
-  </div>
+<div class="icon-grid">
+  <button class="icon-btn" onclick="openPolicy()">
+    <div class="icon-circle ic-red">📋</div>
+    <span class="icon-label">안전보건<br>경영방침</span>
+  </button>
 
-  <button class="menu-btn btn-purple" onclick="togglePanel('p4'); initManual()">📄 안전보건매뉴얼</button>
+  <button class="icon-btn" onclick="togglePanel('p1')">
+    <div class="icon-circle ic-blue">🦺</div>
+    <span class="icon-label">작업별<br>안전조치</span>
+  </button>
+
+  <button class="icon-btn" onclick="togglePanel('p2'); initMSDS()">
+    <div class="icon-circle ic-teal">⚗️</div>
+    <span class="icon-label">MSDS<br>조회</span>
+  </button>
+
+  <button class="icon-btn" onclick="togglePanel('p4'); initManual()">
+    <div class="icon-circle ic-purple">📄</div>
+    <span class="icon-label">안전보건<br>매뉴얼</span>
+  </button>
+
+  <button class="icon-btn" onclick="openPDF('개선제안 현황.pdf','개선제안 현황')">
+    <div class="icon-circle ic-orange">📋</div>
+    <span class="icon-label">개선제안<br>현황</span>
+  </button>
+
+  <button class="icon-btn" onclick="togglePanel('p3'); initEdu()">
+    <div class="icon-circle ic-green">📚</div>
+    <span class="icon-label">안전교육<br>자료</span>
+  </button>
+
+  <button class="icon-btn" onclick="togglePanel('p5'); initForklift()">
+    <div class="icon-circle ic-darkblue">🚜</div>
+    <span class="icon-label">지게차<br>관리</span>
+  </button>
+
+  <button class="icon-btn" onclick="togglePanel('p6')">
+    <div class="icon-circle ic-yellow">🌡️</div>
+    <span class="icon-label">체감온도<br>계산기</span>
+  </button>
+
+  <button class="icon-btn" onclick="togglePanel('p7'); initInspection()">
+    <div class="icon-circle ic-brown">🔍</div>
+    <span class="icon-label">안전합동<br>점검</span>
+  </button>
+</div>
+
+<!-- 패널들 -->
+<div class="sub-panel" id="p1">
+  <div class="panel-title">🦺 작업별 안전조치사항</div>
+  <div class="grid1">
+    <div class="safety-link" onclick="openPDF('/work-height.pdf','고소작업')">🔺 고소작업</div>
+    <div class="safety-link" onclick="openPDF('/forklift.pdf','지게차 작업')">🚜 지게차 작업</div>
+    <div class="safety-link" onclick="openPDF('/fire-work.pdf','화기작업')">🔥 화기작업</div>
+    <div class="safety-link" onclick="openPDF('/equipment-check.pdf','설비점검')">🔧 설비점검</div>
+  </div>
+</div>
+
+<div class="sub-panel" id="p2">
+  <div class="panel-title" id="msdsTitle">⚗️ 공정 선택</div>
+  <div id="msdsBody"></div>
+</div>
+
 <div class="sub-panel" id="p4">
   <div class="panel-title" id="manualTitle">📄 안전보건매뉴얼</div>
   <div id="manualBody"></div>
 </div>
-  <button class="menu-btn btn-orange" onclick="openPDF('개선제안 현황.pdf','개선제안 현황')">📋 개선제안 현황</button>
-  <button class="menu-btn btn-green" onclick="togglePanel('p3'); initEdu()">📚 안전교육자료</button>
-  <div class="sub-panel" id="p3">
+
+<div class="sub-panel" id="p3">
   <div class="panel-title" id="eduTitle">📚 안전교육자료</div>
   <div id="eduBody"></div>
- </div>
-  <button class="menu-btn btn-darkblue" onclick="togglePanel('p5'); initForklift()">🚜 지게차 관리</button>
+</div>
+
 <div class="sub-panel" id="p5">
   <div class="panel-title" id="forkliftTitle">🚜 지게차 관리</div>
   <div id="forkliftBody"></div>
 </div>
-  <button class="menu-btn btn-yellow" onclick="togglePanel('p6')">🌡️ 체감온도 계산기</button>
+
 <div class="sub-panel" id="p6">
   <div class="panel-title">🌡️ 열지수 계산기 (더위)</div>
   <div style="padding:12px; display:flex; flex-direction:column; gap:10px;">
@@ -104,7 +161,11 @@ iframe { flex: 1; width: 100%; border: none; }
     <div id="heatResult"></div>
   </div>
 </div>
-</div>  
+
+<div class="sub-panel" id="p7">
+  <div class="panel-title" id="inspectionTitle">🔍 안전합동점검</div>
+  <div id="inspectionBody"></div>
+</div>
 
 <div class="pdf-overlay" id="pdfOverlay">
   <div class="pdf-bar">
@@ -141,10 +202,7 @@ function togglePanel(id) {
 }
 
 function initMSDS() {
-  if (mPath.length === 0) {
-    mPath = [];
-    renderMSDS();
-  }
+  if (mPath.length === 0) { mPath = []; renderMSDS(); }
 }
 
 function renderMSDS() {
@@ -155,7 +213,6 @@ function renderMSDS() {
 
   let cur = msdsTree;
   for (const k of mPath) cur = cur[k];
-
   if (cur === null) { loadFiles(); return; }
 
   const keys = Object.keys(cur);
@@ -171,65 +228,38 @@ function goNext(key) {
   else renderMSDS();
 }
 
-function goBack() {
-  mPath.pop();
-  renderMSDS();
-}
+function goBack() { mPath.pop(); renderMSDS(); }
 
 async function loadFiles() {
   const body = document.getElementById('msdsBody');
   const title = document.getElementById('msdsTitle');
   title.innerHTML = '<button class="back-btn" onclick="goBack()">←</button> ⚗️ ' + mPath.join(' > ');
   body.innerHTML = '<div class="loading">📂 파일 목록 불러오는 중...</div>';
-
   const folderPath = 'MSDS/' + mPath.join('/');
-
   try {
     const res = await fetch('/api/msds?path=' + encodeURIComponent(folderPath));
     const files = await res.json();
-
-    if (!Array.isArray(files)) {
-      body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
-      return;
-    }
-
+    if (!Array.isArray(files)) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; return; }
     const pdfs = files.filter(f => f.name.endsWith('.pdf'));
-
-    if (pdfs.length === 0) {
-      body.innerHTML = '<div class="loading">파일이 없습니다.</div>';
-      return;
-    }
-
+    if (pdfs.length === 0) { body.innerHTML = '<div class="loading">파일이 없습니다.</div>'; return; }
     body.innerHTML = '<div class="grid1">' + pdfs.map(f => {
       const filePath = folderPath + '/' + f.name;
       const displayName = f.name.replace('.pdf', '');
       return `<div class="file-item" onclick="openPDF('${filePath.replace(/'/g,"\\'")}','${displayName.replace(/'/g,"\\'")}')">📄 ${displayName}</div>`;
     }).join('') + '</div>';
-
-  } catch(e) {
-    body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
-  }
+  } catch(e) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; }
 }
 
 function openPDF(filePath, title) {
   const baseUrl = '/api/msds?path=' + encodeURIComponent(filePath);
   const isIphone = /iPhone/i.test(navigator.userAgent);
-
   document.getElementById('pdfTitle').textContent = title;
-
   const dlBtn = document.getElementById('pdfDownload');
   dlBtn.href = baseUrl + '&download=true';
   dlBtn.download = title + '.pdf';
   dlBtn.target = '_blank';
   dlBtn.rel = 'noopener noreferrer';
-
-  if (isIphone) {
-    // 아이폰: 새 탭으로 열기 → Safari 기본 PDF 뷰어 (전체 페이지 스크롤 가능)
-    window.open(baseUrl + '&preview=true', '_blank');
-    return;
-  }
-
-  // 컴퓨터, 갤럭시: 오버레이로 미리보기
+  if (isIphone) { window.open(baseUrl + '&preview=true', '_blank'); return; }
   document.getElementById('pdfFrame').src = baseUrl + '&preview=true';
   document.getElementById('pdfOverlay').classList.add('show');
 }
@@ -238,122 +268,67 @@ function closePDF() {
   document.getElementById('pdfOverlay').classList.remove('show');
   document.getElementById('pdfFrame').src = '';
 }
-let eduPath = [];
+
 let eduPanelInit = false;
-
 function initEdu() {
-  if (!eduPanelInit) {
-    eduPanelInit = true;
-    eduPath = [];
-    renderEdu();
-  }
+  if (!eduPanelInit) { eduPanelInit = true; renderEdu(); }
 }
-
 function renderEdu() {
-  const title = document.getElementById('eduTitle');
-  const body = document.getElementById('eduBody');
-
-  if (eduPath.length === 0) {
-    title.innerHTML = '📚 안전교육자료';
-    body.innerHTML = `
-      <div class="grid2" style="padding:12px;">
-        <button class="cat-btn green" onclick="loadEduFiles('자체제작')">자체제작</button>
-        <button class="cat-btn green" onclick="loadEduFiles('외부자료')">외부자료</button>
-      </div>`;
-  }
+  document.getElementById('eduTitle').innerHTML = '📚 안전교육자료';
+  document.getElementById('eduBody').innerHTML = `
+    <div class="grid2" style="padding:12px;">
+      <button class="cat-btn green" onclick="loadEduFiles('자체제작')">자체제작</button>
+      <button class="cat-btn green" onclick="loadEduFiles('외부자료')">외부자료</button>
+    </div>`;
 }
-
 async function loadEduFiles(folder) {
   const body = document.getElementById('eduBody');
-  const title = document.getElementById('eduTitle');
-  title.innerHTML = `<button class="back-btn" onclick="resetEdu()">←</button> 📚 ${folder}`;
+  document.getElementById('eduTitle').innerHTML = `<button class="back-btn" onclick="resetEdu()">←</button> 📚 ${folder}`;
   body.innerHTML = '<div class="loading">📂 파일 목록 불러오는 중...</div>';
-
   const folderPath = '안전교육자료/' + folder;
-
   try {
     const res = await fetch('/api/msds?path=' + encodeURIComponent(folderPath));
     const files = await res.json();
-
-    if (!Array.isArray(files)) {
-      body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
-      return;
-    }
-
+    if (!Array.isArray(files)) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; return; }
     const pdfs = files.filter(f => f.name.endsWith('.pdf'));
-
-    if (pdfs.length === 0) {
-      body.innerHTML = '<div class="loading">파일이 없습니다.</div>';
-      return;
-    }
-
+    if (pdfs.length === 0) { body.innerHTML = '<div class="loading">파일이 없습니다.</div>'; return; }
     body.innerHTML = '<div class="grid1">' + pdfs.map(f => {
       const filePath = folderPath + '/' + f.name;
       const displayName = f.name.replace('.pdf', '');
       return `<div class="file-item" onclick="openPDF('${filePath.replace(/'/g,"\\'")}','${displayName.replace(/'/g,"\\'")}')">📄 ${displayName}</div>`;
     }).join('') + '</div>';
-
-  } catch(e) {
-    body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
-  }
+  } catch(e) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; }
 }
+function resetEdu() { eduPanelInit = false; initEdu(); }
 
-function resetEdu() {
-  eduPanelInit = false;
-  initEdu();
-}
 let manualPanelInit = false;
-
 function initManual() {
-  if (!manualPanelInit) {
-    manualPanelInit = true;
-    loadManualFiles();
-  }
+  if (!manualPanelInit) { manualPanelInit = true; loadManualFiles(); }
 }
-
 async function loadManualFiles() {
   const body = document.getElementById('manualBody');
   body.innerHTML = '<div class="loading">📂 파일 목록 불러오는 중...</div>';
-
   try {
     const res = await fetch('/api/msds?path=' + encodeURIComponent('안전보건매뉴얼'));
     const files = await res.json();
-
-    if (!Array.isArray(files)) {
-      body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
-      return;
-    }
-
+    if (!Array.isArray(files)) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; return; }
     const pdfs = files.filter(f => f.name.endsWith('.pdf'));
-
-    if (pdfs.length === 0) {
-      body.innerHTML = '<div class="loading">파일이 없습니다.</div>';
-      return;
-    }
-
+    if (pdfs.length === 0) { body.innerHTML = '<div class="loading">파일이 없습니다.</div>'; return; }
     body.innerHTML = '<div class="grid1">' + pdfs.map(f => {
       const filePath = '안전보건매뉴얼/' + f.name;
       const displayName = f.name.replace('.pdf', '');
       return `<div class="file-item" onclick="openPDF('${filePath.replace(/'/g,"\\'")}','${displayName.replace(/'/g,"\\'")}')">📄 ${displayName}</div>`;
     }).join('') + '</div>';
-
-  } catch(e) {
-    body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
-  }
+  } catch(e) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; }
 }
+
 function openPolicy() {
   const isIphone = /iPhone/i.test(navigator.userAgent);
   const url = 'https://raw.githubusercontent.com/gsgjsh2049-del/safety-ai-app/main/경영방침.png';
-
-  if (isIphone) {
-    window.open(url, '_blank');
-    return;
-  }
-
+  if (isIphone) { window.open(url, '_blank'); return; }
   const overlay = document.createElement('div');
   overlay.id = 'policyOverlay';
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:999;display:flex;flex-direction:column;';
-
   overlay.innerHTML = `
     <div style="background:#1a4a7a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
       <span style="color:white;font-size:14px;font-weight:500;">안전보건 경영방침</span>
@@ -361,94 +336,123 @@ function openPolicy() {
     </div>
     <div style="flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:16px;">
       <img src="${url}" style="max-width:100%;max-height:100%;border-radius:8px;">
-    </div>
-  `;
-
+    </div>`;
   document.body.appendChild(overlay);
-
-  // 뒤로가기 감지용 history 등록
   history.pushState({ policy: true }, '');
 }
-
 function closePolicy() {
   const overlay = document.getElementById('policyOverlay');
   if (overlay) overlay.remove();
 }
-
-// 뒤로가기 누르면 팝업 닫기
 window.addEventListener('popstate', function(e) {
   const overlay = document.getElementById('policyOverlay');
   if (overlay) overlay.remove();
 });
+
 let forkliftPanelInit = false;
-
 function initForklift() {
-  if (!forkliftPanelInit) {
-    forkliftPanelInit = true;
-    loadForkliftFiles();
-  }
+  if (!forkliftPanelInit) { forkliftPanelInit = true; loadForkliftFiles(); }
 }
-
 async function loadForkliftFiles() {
   const body = document.getElementById('forkliftBody');
   body.innerHTML = '<div class="loading">📂 파일 목록 불러오는 중...</div>';
-
   try {
     const res = await fetch('/api/msds?path=' + encodeURIComponent('지게차 관리'));
     const files = await res.json();
-
-    if (!Array.isArray(files)) {
-      body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
-      return;
-    }
-
+    if (!Array.isArray(files)) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; return; }
     const pdfs = files.filter(f => f.name.endsWith('.pdf'));
-
-    if (pdfs.length === 0) {
-      body.innerHTML = '<div class="loading">파일이 없습니다.</div>';
-      return;
-    }
-
+    if (pdfs.length === 0) { body.innerHTML = '<div class="loading">파일이 없습니다.</div>'; return; }
     body.innerHTML = '<div class="grid1">' + pdfs.map(f => {
       const filePath = '지게차 관리/' + f.name;
       const displayName = f.name.replace('.pdf', '');
       return `<div class="file-item" onclick="openPDF('${filePath.replace(/'/g,"\\'")}','${displayName.replace(/'/g,"\\'")}')">📄 ${displayName}</div>`;
     }).join('') + '</div>';
-
-  } catch(e) {
-    body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>';
-  }
+  } catch(e) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; }
 }
+
 function calcHeatIndex() {
   const T = parseFloat(document.getElementById('tempInput').value);
   const R = parseFloat(document.getElementById('humidInput').value);
   const result = document.getElementById('heatResult');
-
   if (isNaN(T) || isNaN(R)) {
     result.innerHTML = '<div class="calc-result" style="background:#fff3cd; color:#856404;">기온과 습도를 입력해주세요.</div>';
     return;
   }
-
   const HIC = -2.2519 + 0.8396*T + 0.0842*R + 0.0007*T*T + 0.0018*T*R - 0.0004*R*R;
-
   let color, label;
-  if (HIC < 27) {
-    color = '#d4edda'; label = '😊 안전';
-  } else if (HIC < 32) {
-    color = '#fff3cd'; label = '⚠️ 수분섭취 필요';
-  } else if (HIC < 41) {
-    color = '#ffd6a5'; label = '🔶 냉방기 등을 활용하여 체감온도를 낮추세요';
-  } else if (HIC < 54) {
-    color = '#ffb3b3'; label = '🔴 휴식을 취하세요';
-  } else {
-    color = '#c0392b'; label = '☠️ 매우 위험';
-  }
-
+  if (HIC < 27) { color = '#d4edda'; label = '😊 안전'; }
+  else if (HIC < 32) { color = '#fff3cd'; label = '⚠️ 수분섭취 필요'; }
+  else if (HIC < 41) { color = '#ffd6a5'; label = '🔶 냉방기 등을 활용하여 체감온도를 낮추세요'; }
+  else if (HIC < 54) { color = '#ffb3b3'; label = '🔴 휴식을 취하세요'; }
+  else { color = '#c0392b'; label = '☠️ 매우 위험'; }
   result.innerHTML = `
     <div class="calc-result" style="background:${color}; color:#333;">
       <div style="font-size:20px; margin-bottom:6px;">${label}</div>
       <div style="font-size:24px; font-weight:700;">열지수 ${HIC.toFixed(1)}°C</div>
     </div>`;
+}
+
+const INSPECTION_PASSWORDS = {
+  '비트리': '1111', '레진': '2222', '세공': '3333',
+  '검사': '4444', '중연삭': '5555', 'G1산업': '6666'
+};
+let inspectionPanelInit = false;
+function initInspection() {
+  if (!inspectionPanelInit) { inspectionPanelInit = true; loadInspectionDates(); }
+}
+async function loadInspectionDates() {
+  const body = document.getElementById('inspectionBody');
+  document.getElementById('inspectionTitle').innerHTML = '🔍 안전합동점검';
+  body.innerHTML = '<div class="loading">📂 날짜 목록 불러오는 중...</div>';
+  try {
+    const res = await fetch('/api/msds?path=' + encodeURIComponent('안전합동점검'));
+    const items = await res.json();
+    if (!Array.isArray(items)) { body.innerHTML = '<div class="loading">불러올 수 없습니다.</div>'; return; }
+    const folders = items.filter(f => f.type === 'dir');
+    if (folders.length === 0) { body.innerHTML = '<div class="loading">데이터가 없습니다.</div>'; return; }
+    body.innerHTML = '<div class="grid2" style="padding:12px;">' +
+      folders.map(f => `<button class="cat-btn" onclick="loadInspectionProcesses('${f.name}')">${f.name}</button>`).join('') + '</div>';
+  } catch(e) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; }
+}
+async function loadInspectionProcesses(date) {
+  const body = document.getElementById('inspectionBody');
+  document.getElementById('inspectionTitle').innerHTML = `<button class="back-btn" onclick="loadInspectionDates()">←</button> 🔍 ${date}`;
+  body.innerHTML = '<div class="loading">📂 공정 목록 불러오는 중...</div>';
+  try {
+    const res = await fetch('/api/msds?path=' + encodeURIComponent('안전합동점검/' + date));
+    const items = await res.json();
+    if (!Array.isArray(items)) { body.innerHTML = '<div class="loading">불러올 수 없습니다.</div>'; return; }
+    const folders = items.filter(f => f.type === 'dir');
+    if (folders.length === 0) { body.innerHTML = '<div class="loading">공정 폴더가 없습니다.</div>'; return; }
+    body.innerHTML = '<div class="grid2" style="padding:12px;">' +
+      folders.map(f => `<button class="cat-btn green" onclick="checkInspectionPassword('${date}','${f.name}')">${f.name}</button>`).join('') + '</div>';
+  } catch(e) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; }
+}
+function checkInspectionPassword(date, process) {
+  const correct = INSPECTION_PASSWORDS[process];
+  if (!correct) { loadInspectionFiles(date, process); return; }
+  const input = prompt(`[${process}] 비밀번호를 입력하세요:`);
+  if (input === null) return;
+  if (input === correct) { loadInspectionFiles(date, process); }
+  else { alert('비밀번호가 틀렸습니다.'); }
+}
+async function loadInspectionFiles(date, process) {
+  const body = document.getElementById('inspectionBody');
+  document.getElementById('inspectionTitle').innerHTML = `<button class="back-btn" onclick="loadInspectionProcesses('${date}')">←</button> 🔍 ${date} > ${process}`;
+  body.innerHTML = '<div class="loading">📂 파일 목록 불러오는 중...</div>';
+  const folderPath = '안전합동점검/' + date + '/' + process;
+  try {
+    const res = await fetch('/api/msds?path=' + encodeURIComponent(folderPath));
+    const files = await res.json();
+    if (!Array.isArray(files)) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; return; }
+    const pdfs = files.filter(f => f.name.endsWith('.pdf'));
+    if (pdfs.length === 0) { body.innerHTML = '<div class="loading">파일이 없습니다.</div>'; return; }
+    body.innerHTML = '<div class="grid1">' + pdfs.map(f => {
+      const filePath = folderPath + '/' + f.name;
+      const displayName = f.name.replace('.pdf', '');
+      return `<div class="file-item" onclick="openPDF('${filePath.replace(/'/g,"\\'")}','${displayName.replace(/'/g,"\\'")}')">📄 ${displayName}</div>`;
+    }).join('') + '</div>';
+  } catch(e) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; }
 }
 </script>
 </body>
