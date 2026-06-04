@@ -113,6 +113,11 @@ iframe { flex: 1; width: 100%; border: none; }
     <div class="icon-circle ic-brown">🔍</div>
     <span class="icon-label">안전합동<br>점검</span>
   </button>
+
+  <button class="icon-btn" onclick="togglePanel('p8'); initForms()">
+    <div class="icon-circle ic-red">📝</div>
+    <span class="icon-label">각종<br>양식</span>
+  </button>
 </div>
 
 <!-- 패널들 -->
@@ -167,6 +172,11 @@ iframe { flex: 1; width: 100%; border: none; }
   <div id="inspectionBody"></div>
 </div>
 
+<div class="sub-panel" id="p8">
+  <div class="panel-title" id="formsTitle">📝 각종양식</div>
+  <div id="formsBody"></div>
+</div>
+
 <div class="pdf-overlay" id="pdfOverlay">
   <div class="pdf-bar">
     <span id="pdfTitle">문서</span>
@@ -197,8 +207,16 @@ let panelOpen = {};
 function togglePanel(id) {
   const el = document.getElementById(id);
   const isOpen = panelOpen[id];
-  el.style.display = isOpen ? 'none' : 'block';
-  panelOpen[id] = !isOpen;
+  // 다른 패널 모두 닫기
+  document.querySelectorAll('.sub-panel').forEach(p => {
+    p.style.display = 'none';
+    panelOpen[p.id] = false;
+  });
+  // 클릭한 패널 토글
+  if (!isOpen) {
+    el.style.display = 'block';
+    panelOpen[id] = true;
+  }
 }
 
 function initMSDS() {
@@ -454,7 +472,70 @@ async function loadInspectionFiles(date, process) {
     }).join('') + '</div>';
   } catch(e) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; }
 }
+
+let formsPanelInit = false;
+function initForms() {
+  if (!formsPanelInit) { formsPanelInit = true; loadForms(); }
+}
+async function loadForms() {
+  const body = document.getElementById('formsBody');
+  document.getElementById('formsTitle').innerHTML = '📝 각종양식';
+  body.innerHTML = '<div class="loading">📂 파일 목록 불러오는 중...</div>';
+  try {
+    const res = await fetch('/api/msds?path=' + encodeURIComponent('각종양식'));
+    const items = await res.json();
+    if (!Array.isArray(items)) { body.innerHTML = '<div class="loading">불러올 수 없습니다.</div>'; return; }
+    const folders = items.filter(f => f.type === 'dir');
+    const pdfs = items.filter(f => f.name.endsWith('.pdf'));
+    if (folders.length === 0 && pdfs.length === 0) {
+      body.innerHTML = '<div class="loading">파일이 없습니다.</div>'; return;
+    }
+    let html = '';
+    if (folders.length > 0) {
+      html += '<div class="grid2" style="padding:12px 12px 4px;">' +
+        folders.map(f => `<button class="cat-btn" onclick="loadFormsFolder('${f.name.replace(/'/g,"\\'")}','각종양식/${f.name.replace(/'/g,"\\'")}','loadForms')">${f.name}</button>`).join('') + '</div>';
+    }
+    if (pdfs.length > 0) {
+      html += '<div class="grid1" style="padding:4px 12px 12px;">' +
+        pdfs.map(f => {
+          const filePath = '각종양식/' + f.name;
+          const displayName = f.name.replace('.pdf','');
+          return `<div class="file-item" onclick="openPDF('${filePath.replace(/'/g,"\\'")}','${displayName.replace(/'/g,"\\'")}')">📄 ${displayName}</div>`;
+        }).join('') + '</div>';
+    }
+    body.innerHTML = html;
+  } catch(e) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; }
+}
+async function loadFormsFolder(folderName, folderPath, backFn) {
+  const body = document.getElementById('formsBody');
+  const backCall = backFn === 'loadForms' ? 'loadForms()' : `loadFormsFolder('${backFn}')`;
+  document.getElementById('formsTitle').innerHTML = `<button class="back-btn" onclick="${backCall}">←</button> 📝 ${folderName}`;
+  body.innerHTML = '<div class="loading">📂 파일 목록 불러오는 중...</div>';
+  try {
+    const res = await fetch('/api/msds?path=' + encodeURIComponent(folderPath));
+    const items = await res.json();
+    if (!Array.isArray(items)) { body.innerHTML = '<div class="loading">불러올 수 없습니다.</div>'; return; }
+    const subFolders = items.filter(f => f.type === 'dir');
+    const pdfs = items.filter(f => f.name.endsWith('.pdf'));
+    if (subFolders.length === 0 && pdfs.length === 0) {
+      body.innerHTML = '<div class="loading">파일이 없습니다.</div>'; return;
+    }
+    let html = '';
+    if (subFolders.length > 0) {
+      html += '<div class="grid2" style="padding:12px 12px 4px;">' +
+        subFolders.map(f => `<button class="cat-btn green" onclick="loadFormsFolder('${f.name.replace(/'/g,"\\'")}','${(folderPath+'/'+f.name).replace(/'/g,"\\'")}','${folderName.replace(/'/g,"\\'")}')"> ${f.name}</button>`).join('') + '</div>';
+    }
+    if (pdfs.length > 0) {
+      html += '<div class="grid1" style="padding:4px 12px 12px;">' +
+        pdfs.map(f => {
+          const filePath = folderPath + '/' + f.name;
+          const displayName = f.name.replace('.pdf','');
+          return `<div class="file-item" onclick="openPDF('${filePath.replace(/'/g,"\\'")}','${displayName.replace(/'/g,"\\'")}')">📄 ${displayName}</div>`;
+        }).join('') + '</div>';
+    }
+    body.innerHTML = html;
+  } catch(e) { body.innerHTML = '<div class="loading">파일을 불러올 수 없습니다.</div>'; }
+}
 </script>
 </body>
 </html>
-
