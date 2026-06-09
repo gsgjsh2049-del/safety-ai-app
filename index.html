@@ -217,7 +217,7 @@ function openPDF(filePath, title) {
   document.getElementById('pdfTitle').textContent = title;
   const dl = document.getElementById('pdfDownload');
   dl.href = url + '&download=true'; dl.download = title + '.pdf';
-  if (/iPhone/i.test(navigator.userAgent)) { window.open(url + '&preview=true', '_blank'); return; }
+  if (/iPhone|Android/i.test(navigator.userAgent)) { window.open(url + '&preview=true', '_blank'); return; }
   document.getElementById('pdfFrame').src = url + '&preview=true';
   document.getElementById('pdfOverlay').classList.add('show');
 }
