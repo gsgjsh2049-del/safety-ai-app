@@ -212,17 +212,18 @@ function loadSimpleFolder(folderPath, panelId) {
 }
 
 // ── PDF 뷰어 ────────────────────────────────────────────────
-const dl = document.getElementById('pdfDownload');
-  const isMSDS = filePath.includes('MSDS') || filePath.includes('msds');
-  dl.style.display = isMSDS ? 'none' : '';
-  dl.href = url + '&download=true'; dl.download = title + '.pdf';
+function openPDF(filePath, title) {
+  const url = '/api/msds?path=' + encodeURIComponent(filePath);
   document.getElementById('pdfTitle').textContent = title;
   const dl = document.getElementById('pdfDownload');
+  const isMSDS = filePath.includes('MSDS') || filePath.includes('msds');
+  dl.style.display = isMSDS ? 'none' : '';
   dl.href = url + '&download=true'; dl.download = title + '.pdf';
   if (/iPhone|Android/i.test(navigator.userAgent)) { window.open(url + '&preview=true', '_blank'); return; }
   document.getElementById('pdfFrame').src = url + '&preview=true';
   document.getElementById('pdfOverlay').classList.add('show');
 }
+Claude
 function closePDF() {
   document.getElementById('pdfOverlay').classList.remove('show');
   document.getElementById('pdfFrame').src = '';
