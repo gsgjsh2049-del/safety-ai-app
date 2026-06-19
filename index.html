@@ -212,8 +212,10 @@ function loadSimpleFolder(folderPath, panelId) {
 }
 
 // ── PDF 뷰어 ────────────────────────────────────────────────
-function openPDF(filePath, title) {
-  const url = '/api/msds?path=' + encodeURIComponent(filePath);
+const dl = document.getElementById('pdfDownload');
+  const isMSDS = filePath.includes('MSDS') || filePath.includes('msds');
+  dl.style.display = isMSDS ? 'none' : '';
+  dl.href = url + '&download=true'; dl.download = title + '.pdf';
   document.getElementById('pdfTitle').textContent = title;
   const dl = document.getElementById('pdfDownload');
   dl.href = url + '&download=true'; dl.download = title + '.pdf';
