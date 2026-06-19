@@ -281,8 +281,6 @@ async function loadEduSub(folder) {
 }
 
 // ── 안전합동점검 ────────────────────────────────────────────
-const INSPECTION_PW = { '비트리':'1111','레진':'2222','세공':'3333','검사':'4444','중연삭':'5555','G1산업':'6666' };
-
 async function loadInspectionDates() {
   setTitle('p7', '🔍 안전합동점검');
   loading('p7');
@@ -300,8 +298,6 @@ async function loadInspectionProcesses(date) {
   setBody('p7', folders.length ? folderBtnsHTML(folders, 'green', n => `checkInspectionPW('${esc(date)}','${esc(n)}')`) : '<div class="loading">공정 폴더가 없습니다.</div>');
 }
 function checkInspectionPW(date, process) {
-  const pw = INSPECTION_PW[process];
-  if (pw && prompt(`[${process}] 비밀번호를 입력하세요:`) !== pw) { alert('비밀번호가 틀렸습니다.'); return; }
   loadInspectionFiles(date, process);
 }
 async function loadInspectionFiles(date, process) {
