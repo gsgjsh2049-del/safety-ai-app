@@ -221,11 +221,11 @@ function openPDF(filePath, title) {
   dl.href = url + '&download=true'; dl.download = title + '.pdf';
   if (/iPhone/i.test(navigator.userAgent)) {
     const toast = document.createElement('div');
-    toast.textContent = '문서를 닫으려면 ✕ 또는 왼쪽으로 슬라이드하세요';
+    toast.textContent = '📄 열린 탭에서 왼쪽 슬라이드로 돌아오세요';
     toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:white;padding:10px 16px;border-radius:20px;font-size:13px;z-index:9999;text-align:center;white-space:nowrap;';
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
-    setTimeout(() => window.open(url + '&preview=true', '_blank'), 1500);
+    window.open(url + '&preview=true', '_blank');
     return;
   }
   document.getElementById('pdfFrame').src = url + '&preview=true';
