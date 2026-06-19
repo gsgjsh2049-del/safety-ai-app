@@ -223,7 +223,6 @@ function openPDF(filePath, title) {
   document.getElementById('pdfFrame').src = url + '&preview=true';
   document.getElementById('pdfOverlay').classList.add('show');
 }
-Claude
 function closePDF() {
   document.getElementById('pdfOverlay').classList.remove('show');
   document.getElementById('pdfFrame').src = '';
