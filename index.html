@@ -131,9 +131,9 @@ iframe { flex: 1; width: 100%; border: none; }
 
 <div class="pdf-overlay" id="pdfOverlay">
   <div class="pdf-bar">
+    <button onclick="closePDF()" style="font-size:20px;margin-right:10px;">← 뒤로</button>
     <span id="pdfTitle">문서</span>
     <a id="pdfDownload" href="" target="_blank">⬇ 다운로드</a>
-    <button onclick="closePDF()">✕</button>
   </div>
   <iframe id="pdfFrame" src=""></iframe>
 </div>
@@ -219,7 +219,14 @@ function openPDF(filePath, title) {
   const isMSDS = filePath.includes('MSDS') || filePath.includes('msds');
   dl.style.display = isMSDS ? 'none' : '';
   dl.href = url + '&download=true'; dl.download = title + '.pdf';
-  if (/iPhone|Android/i.test(navigator.userAgent)) { window.open(url + '&preview=true', '_blank'); return; }
+  if (/iPhone/i.test(navigator.userAgent)) {
+    const toast = document.createElement('div');
+    toast.textContent = '문서를 닫으려면 ✕ 또는 왼쪽으로 슬라이드하세요';
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:white;padding:10px 16px;border-radius:20px;font-size:13px;z-index:9999;text-align:center;white-space:nowrap;';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+    window.open(url + '&preview=true', '_blank'); return;
+  }
   document.getElementById('pdfFrame').src = url + '&preview=true';
   document.getElementById('pdfOverlay').classList.add('show');
 }
