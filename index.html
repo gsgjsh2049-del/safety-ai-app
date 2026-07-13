@@ -110,6 +110,9 @@ iframe { flex: 1; width: 100%; border: none; }
   <button class="icon-btn" onclick="togglePanel('p8'); initPanel('p8')">
     <div class="icon-circle ic-red">📝</div><span class="icon-label">각종<br>양식</span>
   </button>
+  <button class="icon-btn" onclick="togglePanel('p9'); initPanel('p9')">
+    <div class="icon-circle ic-orange">🚨</div><span class="icon-label">중대재해<br>사이렌</span>
+  </button>
 </div>
 
 <!-- 패널들 -->
@@ -155,6 +158,10 @@ iframe { flex: 1; width: 100%; border: none; }
   <div class="panel-title" id="p8-title">📝 각종양식</div>
   <div id="p8-body"></div>
 </div>
+<div class="sub-panel" id="p9">
+  <div class="panel-title" id="p9-title">🚨 중대재해 사이렌</div>
+  <div id="p9-body"></div>
+</div>
 
 <div class="pdf-overlay" id="pdfOverlay">
   <div class="pdf-bar">
@@ -199,7 +206,8 @@ function initPanel(id) {
   panelInited[id] = true;
   ({ p2: renderMSDS, p3: renderEdu, p4: loadSimpleFolder('안전보건매뉴얼', 'p4'),
      p5: loadSimpleFolder('지게차 관리', 'p5'), p7: loadInspectionDates,
-     p8: loadFolderPanel('각종양식', 'p8', '📝 각종양식') })[id]?.();
+     p8: loadFolderPanel('각종양식', 'p8', '📝 각종양식'),
+     p9: loadFolderPanel('중대재해사이렌', 'p9', '🚨 중대재해 사이렌') })[id]?.();
 }
 
 async function fetchFolder(path) {
