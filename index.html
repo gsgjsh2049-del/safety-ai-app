@@ -381,7 +381,7 @@ function calcHeatIndex() {
   if (isNaN(T) || isNaN(R)) { el.innerHTML = '<div class="calc-result" style="background:#fff3cd;color:#856404;">기온과 습도를 입력해주세요.</div>'; return; }
   const H = -2.2519 + 0.8396*T + 0.0842*R + 0.0007*T*T + 0.0018*T*R - 0.0004*R*R;
   const [color, label] = H < 27 ? ['#d4edda','😊 안전'] : H < 32 ? ['#fff3cd','⚠️ 수분섭취 필요'] :
-    H < 41 ? ['#ffd6a5','🔶 냉방기 등을 활용하여 체감온도를 낮추세요'] : H < 54 ? ['#ffb3b3','🔴 휴식을 취하세요'] : ['#c0392b','☠️ 매우 위험'];
+    H < 41 ? ['#ffd6a5','🔶 냉방장치 사용&휴식을 취하세요'] : H < 54 ? ['#ffb3b3','🔴 옥외작업 중지'] : ['#c0392b','☠️ 매우 위험'];
   el.innerHTML = `<div class="calc-result" style="background:${color};color:#333;"><div style="font-size:20px;margin-bottom:6px;">${label}</div><div style="font-size:24px;font-weight:700;">열지수 ${H.toFixed(1)}°C</div></div>`;
 }
 
