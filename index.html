@@ -36,6 +36,7 @@ body { font-family: -apple-system, sans-serif; background: #f0f2f5; min-height: 
 .ic-red{background:#c0392b} .ic-blue{background:#1a4a7a} .ic-teal{background:#16a085}
 .ic-purple{background:#8e44ad} .ic-orange{background:#e67e22} .ic-green{background:#27ae60}
 .ic-darkblue{background:#2980b9} .ic-yellow{background:#f39c12} .ic-brown{background:#795548}
+.ic-gray{background:#546e7a}
 .sub-panel { display: none; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin: 0 16px 12px; }
 .panel-title { padding: 12px 16px; background: #f8f8f8; border-bottom: 1px solid #eee; font-size: 13px; font-weight: 600; color: #444; display: flex; align-items: center; gap: 8px; }
 .back-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #666; line-height: 1; }
@@ -114,6 +115,9 @@ iframe { flex: 1; width: 100%; border: none; }
   <button class="icon-btn" onclick="togglePanel('p9'); initPanel('p9')">
     <div class="icon-circle ic-orange">🚨</div><span class="icon-label">중대재해<br>사이렌</span>
   </button>
+  <button class="icon-btn" onclick="togglePanel('p10'); initPanel('p10')">
+    <div class="icon-circle ic-gray">🔎</div><span class="icon-label">재해원인<br>조사보고서</span>
+  </button>
 </div>
 
 <!-- 패널들 -->
@@ -163,6 +167,10 @@ iframe { flex: 1; width: 100%; border: none; }
   <div class="panel-title" id="p9-title">🚨 중대재해 사이렌</div>
   <div id="p9-body"></div>
 </div>
+<div class="sub-panel" id="p10">
+  <div class="panel-title" id="p10-title">🔎 재해원인조사 보고서</div>
+  <div id="p10-body"></div>
+</div>
 
 <div class="pdf-overlay" id="pdfOverlay">
   <div class="pdf-bar">
@@ -208,7 +216,8 @@ function initPanel(id) {
   ({ p2: renderMSDS, p3: renderEdu, p4: loadSimpleFolder('안전보건매뉴얼', 'p4'),
      p5: loadSimpleFolder('지게차 관리', 'p5'), p7: loadInspectionDates,
      p8: loadFolderPanel('각종양식', 'p8', '📝 각종양식'),
-     p9: loadFolderPanel('중대재해사이렌', 'p9', '🚨 중대재해 사이렌') })[id]?.();
+     p9: loadFolderPanel('중대재해사이렌', 'p9', '🚨 중대재해 사이렌'),
+     p10: loadReports })[id]?.();
 }
 
 async function fetchFolder(path) {
@@ -249,22 +258,23 @@ function loadSimpleFolder(folderPath, panelId) {
 
 // ── PDF 뷰어 ────────────────────────────────────────────────
 function openPDF(filePath, title) {
-  const url = '/api/msds?path=' + encodeURIComponent(filePath);
+  // 정적 경로로 직접 열기 (서버 함수 경유 시 4.5MB 초과 파일이 열리지 않음)
+  const url = '/' + filePath.replace(/^\//, '').split('/').map(encodeURIComponent).join('/');
   document.getElementById('pdfTitle').textContent = title;
   const dl = document.getElementById('pdfDownload');
   const isMSDS = filePath.includes('MSDS') || filePath.includes('msds');
   dl.style.display = isMSDS ? 'none' : '';
-  dl.href = url + '&download=true'; dl.download = title + '.pdf';
+  dl.href = url; dl.download = title + '.pdf';
   if (/iPhone/i.test(navigator.userAgent)) {
     const toast = document.createElement('div');
     toast.textContent = '📄 열린 탭에서 왼쪽 슬라이드로 돌아오세요';
     toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:white;padding:10px 16px;border-radius:20px;font-size:13px;z-index:9999;text-align:center;white-space:nowrap;';
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
-    window.open(url + '&preview=true', '_blank');
+    window.open(url, '_blank');
     return;
   }
-  document.getElementById('pdfFrame').src = url + '&preview=true';
+  document.getElementById('pdfFrame').src = url;
   document.getElementById('pdfOverlay').classList.add('show');
 }
 function closePDF() {
@@ -372,6 +382,34 @@ async function browseFolder(path, panelId, label, backFn) {
     folders.map(f => `<button class="cat-btn" onclick="browseFolder('${esc(path+'/'+f.name)}','${panelId}','📝 ${esc(f.name)}','${esc(myBack)}')">${f.name}</button>`).join('') + '</div>';
   if (pdfs.length) html += pdfListHTML(items, path);
   setBody(panelId, html);
+}
+
+// ── 재해원인조사 보고서 (검색 지원) ───────────────────────
+const REPORT_DIR = '재해원인조사 보고서';
+let reportFiles = [];
+async function loadReports() {
+  loading('p10');
+  const items = await fetchFolder(REPORT_DIR).catch(() => null);
+  if (!items) { errMsg('p10'); return; }
+  reportFiles = items.filter(f => f.name.toLowerCase().endsWith('.pdf'))
+    .map(f => f.name).sort((a, b) => b.localeCompare(a, 'ko'));
+  if (!reportFiles.length) { setBody('p10', '<div class="loading">파일이 없습니다.</div>'); return; }
+  setBody('p10', `<div style="padding:12px 12px 0;">
+      <input class="calc-input" id="reportSearch" type="search" placeholder="🔍 검색 (예: 끼임, 추락, 지게차)" oninput="renderReports(this.value)" style="margin-top:0;">
+      <div id="reportCount" style="font-size:12px;color:#888;margin-top:6px;"></div>
+    </div><div id="reportList"></div>`);
+  renderReports('');
+}
+function renderReports(q) {
+  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const list = reportFiles.filter(n => words.every(w => n.toLowerCase().includes(w)));
+  document.getElementById('reportCount').textContent = `전체 ${reportFiles.length}건` + (words.length ? ` 중 ${list.length}건` : '');
+  document.getElementById('reportList').innerHTML = list.length
+    ? '<div class="grid1">' + list.map(n => {
+        const dn = n.replace(/\.pdf$/i, '');
+        return `<div class="file-item" onclick="openPDF('${esc(REPORT_DIR + '/' + n)}','${esc(dn)}')">📄 ${dn}</div>`;
+      }).join('') + '</div>'
+    : '<div class="loading">검색 결과가 없습니다.</div>';
 }
 
 // ── 열지수 계산기 ───────────────────────────────────────────
